@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>Hello World</title>
+    <url>/2022/12/27/hello-world/</url>
+    <content><![CDATA[<p>Welcome to <a class="link"   href="https://hexo.io/" >Hexo<i class="fa-solid fa-up-right-from-square"></i></a>! This is your very first post. Check <a class="link"   href="https://hexo.io/docs/" >documentation<i class="fa-solid fa-up-right-from-square"></i></a> for more info. If you get any problems when using Hexo, you can find the answer in <a class="link"   href="https://hexo.io/docs/troubleshooting.html" >troubleshooting<i class="fa-solid fa-up-right-from-square"></i></a> or you can ask me on <a class="link"   href="https://github.com/hexojs/hexo/issues" >GitHub<i class="fa-solid fa-up-right-from-square"></i></a>.</p>
+<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure></div>
+
+<p>More info: <a class="link"   href="https://hexo.io/docs/writing.html" >Writing<i class="fa-solid fa-up-right-from-square"></i></a></p>
+<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure></div>
+
+<p>More info: <a class="link"   href="https://hexo.io/docs/server.html" >Server<i class="fa-solid fa-up-right-from-square"></i></a></p>
+<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure></div>
+
+<p>More info: <a class="link"   href="https://hexo.io/docs/generating.html" >Generating<i class="fa-solid fa-up-right-from-square"></i></a></p>
+<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><div class="highlight-container" data-rel="Bash"><figure class="iseeu highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure></div>
+
+<p>More info: <a class="link"   href="https://hexo.io/docs/one-command-deployment.html" >Deployment<i class="fa-solid fa-up-right-from-square"></i></a></p>
+]]></content>
+  </entry>
+  <entry>
+    <title>my first blog</title>
+    <url>/2022/12/27/my%20first%20blog/my-first-blog/</url>
+    <content><![CDATA[<h1 id="P0-Study"><a href="#P0-Study" class="headerlink" title="P0_Study"></a>P0_Study</h1><h2 id="电路分析设计"><a href="#电路分析设计" class="headerlink" title="电路分析设计"></a>电路分析设计</h2><ol>
+<li>Input与Output分析</li>
+<li>功能分析<br>（可以先进行类似于表格的书面化说明，明白好设计思路与设计需求再去设计电路）</li>
+<li>分层设计与分模块设计<br>模块类似于函数的封装，便于理清思路、清晰电路、debug<br>eg1.Moore机与Mealy机都可以划分为状态转移、状态存储、输出模块<br>eg2.32位加法器分为多个一位加法器<br>PS：注意子电路的<strong>appearance</strong>，要跟题目要求一致</li>
+</ol>
+<h2 id="有限状态机"><a href="#有限状态机" class="headerlink" title="有限状态机"></a>有限状态机</h2><p>首先回顾一下Moore和Mealy叭！<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/asset/Moore&Mealy.png"
+                      alt="1"
+                ></p>
+<ol>
+<li>状态转移电路一般只是<strong>组合逻辑</strong>的计算，也就是说随着input的变化（无论clk处于什么状态），其计算的状态也相应发生，所以一定要有<em>状态存储</em>模块，clk处于上升沿时输出prev_state存入now_state</li>
+<li>对于组合逻辑部分，画好状态转移图，一个经济有效的方法就是<em>打表</em>，利用analyze circuit来实现  </li>
+<li>一定弄清题目对于输出的要求，<em>正确使用register</em></li>
+</ol>
+<h2 id="线路颜色不对报错"><a href="#线路颜色不对报错" class="headerlink" title="线路颜色不对报错"></a>线路颜色不对报错</h2><p>小结：</p>
+<ol>
+<li>红色 E 的可能原因：短路&#x2F;多驱动，门电路没接输入，多驱动即相当于多个逻辑运算assign同一个output，这当然是不行的</li>
+<li>状态转移模块是组合逻辑，不需要时钟，不需要 reset</li>
+<li>真值表生成电路功能的使用  </li>
+<li>不要在组合逻辑电路中出现环路，否则会出现震荡！</li>
+</ol>
+<h2 id="question"><a href="#question" class="headerlink" title="question"></a>question</h2><ol>
+<li>register的使用（navigation那里）<br>①先把问题转化成有限状态机，再把有限状态机实现成电路<br>②每个时钟上升沿到来，更新寄存器的值</li>
+<li>三态问题？什么时候用三态？（好像三态的输入用逻辑门运算会变红）<br>不用考虑三态</li>
+<li>二进制减法qaq不会（主要是ftoi那里）<br>扩展为32位，再用0去减<br>用0去减其实与非门等效</li>
+</ol>
+<h2 id="CRC"><a href="#CRC" class="headerlink" title="CRC"></a>CRC</h2><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/asset/CRC%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF.png"
+                      alt="1"
+                ><br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/asset/CRC%E8%AE%A1%E7%AE%97%E8%BF%87%E7%A8%8B.png"
+                      alt="1"
+                ></p>
+<ol>
+<li>体现了模块化的思想</li>
+<li>要审题，题目说了被除数是要拼接的</li>
+<li>注意splitter的最高位最低位以及数据的最高位最低为的对应，不要反了！</li>
+</ol>
+<h2 id="GRF"><a href="#GRF" class="headerlink" title="GRF"></a>GRF</h2><p>题目不难，注意线路很杂的时候要看有没有接上或者接错，CTRL CV 的时候tunnel要改完改对</p>
+<h2 id="ftoi"><a href="#ftoi" class="headerlink" title="ftoi"></a>ftoi</h2><ol>
+<li>二进制浮点数小数点几位，相当于右移几位；乘2^n想当于左移（正数），注意要先左移再右移，否则就丢失掉后面的数据位了</li>
+<li>二进制减法？不会qaq</li>
+<li>计算负数的补码，取反（非门计算）+1，（？2^n-x感觉是不是不太行，因为n达不到32位） </li>
+<li>学会试着使用simulate-logging功能debug</li>
+</ol>
+<h2 id="navigation"><a href="#navigation" class="headerlink" title="navigation"></a>navigation</h2><ol>
+<li>状态转移打表 “课上课下打表最经济有效”————董老 salute！<br>此处状态转移以及hit都可以打表得到（注意打表的时候输入输出都只能是一位，这里需要splitter套层皮，同样是注意高低位）</li>
+<li>太憨了！看好输入输出要求，是否提供clk，如果clk是一个input就不要再自己放一个clk了，太憨。</li>
+<li>注意状态存储部分要符合题目要求</li>
+<li>状态转移打表、register存储、input和prev_state决定输出，这些没什么好说的</li>
+<li>What deserves special mention is 注意这里利用MUX实现了同步复位，因为后面有register，只有clk处于上升沿，这个clr才是有效的（组合逻辑是不是们没有任何延迟？目前是的）</li>
+</ol>
+<h2 id="祝上机顺利！"><a href="#祝上机顺利！" class="headerlink" title="祝上机顺利！"></a>祝上机顺利！</h2>]]></content>
+  </entry>
+</search>
