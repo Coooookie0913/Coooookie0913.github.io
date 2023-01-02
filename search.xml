@@ -341,6 +341,647 @@
       </tags>
   </entry>
   <entry>
+    <title>P4</title>
+    <url>/2023/01/02/P4/</url>
+    <content><![CDATA[<h1 id="P4-Study"><a href="#P4-Study" class="headerlink" title="P4_Study"></a>P4_Study</h1><h1 id="1-单周期CPU设计方案（Verilog实现）"><a href="#1-单周期CPU设计方案（Verilog实现）" class="headerlink" title="1 单周期CPU设计方案（Verilog实现）"></a>1 单周期CPU设计方案（Verilog实现）</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所呈现的是利用Verilog实现的MIPS架构CPU，可以支持10条指令，含有PC、NPC、IM、GRF、ALU、DM、Controller、EXT、Branch模块。整体采用自下而上的设计思路。</p>
+<h2 id="1-2-实现指令说明"><a href="#1-2-实现指令说明" class="headerlink" title="1.2 实现指令说明"></a>1.2 实现指令说明</h2><h3 id="1-2-1-R型指令"><a href="#1-2-1-R型指令" class="headerlink" title="1.2.1 R型指令"></a>1.2.1 R型指令</h3><p>算术指令：add(暂视为不做溢出检查)，sub（暂视为不做溢出检查）<br>跳转指令：jr</p>
+<h3 id="1-2-2-I型指令"><a href="#1-2-2-I型指令" class="headerlink" title="1.2.2 I型指令"></a>1.2.2 I型指令</h3><p>B类指令：beq<br>算术指令：lui，ori<br>访存指令：lw，sw</p>
+<h3 id="1-2-3-J型指令"><a href="#1-2-3-J型指令" class="headerlink" title="1.2.3 J型指令"></a>1.2.3 J型指令</h3><p>跳转指令：jal</p>
+<h3 id="1-2-4-其他"><a href="#1-2-4-其他" class="headerlink" title="1.2.4 其他"></a>1.2.4 其他</h3><p>nop</p>
+<h2 id="1-3-数据通路模块定义"><a href="#1-3-数据通路模块定义" class="headerlink" title="1.3 数据通路模块定义"></a>1.3 数据通路模块定义</h2><h3 id="1-3-1-PC"><a href="#1-3-1-PC" class="headerlink" title="1.3.1 PC"></a>1.3.1 PC</h3><p>该模块包含一个32位寄存器用于存储当前执行的指令地址，考虑到可综合性，不用添加initial模块，通过tb里的reset来实现initial。<br><strong>注意：</strong> 指令地址从0x0000_3000开始</p>
+<ul>
+<li>端口定义<table>
+<thead>
+<tr>
+<th>信号名</th>
+<th>方向</th>
+<th>位宽</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>clk</td>
+<td>I</td>
+<td>1</td>
+<td>时钟信号</td>
+</tr>
+<tr>
+<td>reset</td>
+<td>I</td>
+<td>1</td>
+<td>同步复位信号</td>
+</tr>
+<tr>
+<td>NPC</td>
+<td>I</td>
+<td>32</td>
+<td>下一条指令地址</td>
+</tr>
+<tr>
+<td>PC</td>
+<td>O</td>
+<td>32</td>
+<td>当前指令地址</td>
+</tr>
+</tbody></table>
+</li>
+<li>功能定义<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>功能名称</th>
+<th>功能描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>同步复位</td>
+<td>时钟上升沿到来时，如果reset信号有效，地址置为0x0000_3000</td>
+</tr>
+<tr>
+<td>2</td>
+<td>写入NPC</td>
+<td>将下一条指令地址NPC写入寄存器</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h3 id="1-3-2-NPC"><a href="#1-3-2-NPC" class="headerlink" title="1.3.2 NPC"></a>1.3.2 NPC</h3><p>该模块为逻辑运算，通过选择信号和当前指令计算出下一条指令地址</p>
+<ul>
+<li>端口定义  <table>
+<thead>
+<tr>
+<th>信号名</th>
+<th>方向</th>
+<th>位宽</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>pc</td>
+<td>I</td>
+<td>32</td>
+<td>当前指令地址</td>
+</tr>
+<tr>
+<td>imm16</td>
+<td>I</td>
+<td>16</td>
+<td>instr[15:0]</td>
+</tr>
+<tr>
+<td>imm26</td>
+<td>I</td>
+<td>26</td>
+<td>instr[25:0]</td>
+</tr>
+<tr>
+<td>ra</td>
+<td>I</td>
+<td>32</td>
+<td>GPR[ra] (也可以是其他寄存器的内容)</td>
+</tr>
+<tr>
+<td>PCCtrl</td>
+<td>I</td>
+<td>1</td>
+<td>0 ：选择pc+4 <br> 1 ：选择beq所对应的npc</td>
+</tr>
+<tr>
+<td>Jump</td>
+<td>I</td>
+<td>1</td>
+<td>0:不是jr&#x2F;jal指令 <br> 1:是jr&#x2F;jal指令</td>
+</tr>
+<tr>
+<td>jr</td>
+<td>I</td>
+<td>1</td>
+<td>0：不是jr指令 <br> 1:是jr指令</td>
+</tr>
+</tbody></table>
+</li>
+<li>B类与J类指令实现机制<br>通过mux实现对npc的输出选择<br><strong>注意：</strong><br>弄清楚mux的0、1对应</li>
+</ul>
+<h3 id="1-3-3-IM"><a href="#1-3-3-IM" class="headerlink" title="1.3.3 IM"></a>1.3.3 IM</h3><p>该模块为指令存储单元，大小为4096*32 bits<br><strong>注意：</strong>  </p>
+<ol>
+<li>ROM为只读存储器，reset时其中数据不清零</li>
+<li>pc默认是从0x0000_3000开始，故使用pc在ROM中索引相应指令时应为<code>temp = pc - 32&#39;h0000_3000</code></li>
+<li>ROM容量为2^12，故<code>addr = temp[13:2]</code></li>
+<li>利用系统调用函数读取指令信息<div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="keyword">initial</span> <span class="keyword">begin</span></span><br><span class="line">        <span class="built_in">$readmemh</span>(<span class="string">&quot;code.txt&quot;</span>,rom);</span><br><span class="line">    <span class="keyword">end</span></span><br></pre></td></tr></table></figure></div></li>
+</ol>
+<ul>
+<li>端口定义<table>
+<thead>
+<tr>
+<th>信号名</th>
+<th>方向</th>
+<th>位宽</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>clk</td>
+<td>I</td>
+<td>1</td>
+<td>时钟信号</td>
+</tr>
+<tr>
+<td>reset</td>
+<td>I</td>
+<td>1</td>
+<td>同步复位信号</td>
+</tr>
+<tr>
+<td>pc</td>
+<td>I</td>
+<td>32</td>
+<td>当前指令地址</td>
+</tr>
+<tr>
+<td>opcode</td>
+<td>O</td>
+<td>6</td>
+<td>instr[31：26]</td>
+</tr>
+<tr>
+<td>func</td>
+<td>O</td>
+<td>6</td>
+<td>instr[5:0]</td>
+</tr>
+<tr>
+<td>rs</td>
+<td>O</td>
+<td>6</td>
+<td>instr[25:21]</td>
+</tr>
+<tr>
+<td>rt</td>
+<td>O</td>
+<td>6</td>
+<td>instr[20:16]</td>
+</tr>
+<tr>
+<td>rd</td>
+<td>O</td>
+<td>6</td>
+<td>instr[15:11]</td>
+</tr>
+<tr>
+<td>imm16</td>
+<td>O</td>
+<td>16</td>
+<td>imm16[15:0]</td>
+</tr>
+<tr>
+<td>imm26</td>
+<td>O</td>
+<td>26</td>
+<td>imm26[25:0]</td>
+</tr>
+</tbody></table>
+</li>
+<li>功能定义<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>功能名称</th>
+<th>功能描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>取指令</td>
+<td>根据pc在ROM中取出相应指令</td>
+</tr>
+<tr>
+<td>2</td>
+<td>取数据</td>
+<td>splitter行为，取出instr不同位所拥有的信息</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h3 id="1-3-4-GRF"><a href="#1-3-4-GRF" class="headerlink" title="1.3.4 GRF"></a>1.3.4 GRF</h3><p>该模块包含32个32位寄存器，对应MIPS架构中$0~$31通用寄存器，可以通过输入的5位地址访存寄存器，其中，$0寄存器设置写入信息为const0。</p>
+<ul>
+<li>端口定义<table>
+<thead>
+<tr>
+<th>信号名</th>
+<th>方向</th>
+<th>位宽</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>clk</td>
+<td>I</td>
+<td>1</td>
+<td>时钟信号</td>
+</tr>
+<tr>
+<td>reset</td>
+<td>I</td>
+<td>1</td>
+<td>同步复位信号</td>
+</tr>
+<tr>
+<td>A1</td>
+<td>I</td>
+<td>5</td>
+<td>需要读取的第一个寄存器编号</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>I</td>
+<td>5</td>
+<td>需要读取的第二个寄存器编号</td>
+</tr>
+<tr>
+<td>A3</td>
+<td>I</td>
+<td>5</td>
+<td>需要写入的寄存器编号</td>
+</tr>
+<tr>
+<td>pc</td>
+<td>I</td>
+<td>32</td>
+<td>当前指令的地址</td>
+</tr>
+<tr>
+<td>Data</td>
+<td>I</td>
+<td>32</td>
+<td>需要写入的数据</td>
+</tr>
+<tr>
+<td>RegWrite</td>
+<td>I</td>
+<td>1</td>
+<td>写使能信号</td>
+</tr>
+<tr>
+<td>RD1</td>
+<td>O</td>
+<td>32</td>
+<td>读取的第一个寄存器数据</td>
+</tr>
+<tr>
+<td>RD2</td>
+<td>O</td>
+<td>32</td>
+<td>读取的第二个寄存器数据</td>
+</tr>
+</tbody></table>
+</li>
+<li>功能定义<table>
+<thead>
+<tr>
+<th>序号</th>
+<th>功能名称</th>
+<th>功能描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>同步复位</td>
+<td>当时钟上升沿到来，若reset信号有效，寄存器全部置0</td>
+</tr>
+<tr>
+<td>2</td>
+<td>读取寄存器</td>
+<td>根据寄存器编号读取寄存器内容</td>
+</tr>
+<tr>
+<td>3</td>
+<td>写寄存器</td>
+<td>根据寄存器编号、写使能信号、写入数据，向相应寄存器写入数据</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h3 id="1-3-5-ALU"><a href="#1-3-5-ALU" class="headerlink" title="1.3.5 ALU"></a>1.3.5 ALU</h3><p>该模块通过计算控制信号aluCtrl实现计算</p>
+<ul>
+<li>端口说明<table>
+<thead>
+<tr>
+<th>信号名</th>
+<th>方向</th>
+<th>位宽</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>SourceA</td>
+<td>I</td>
+<td>32</td>
+<td>第一个操作数</td>
+</tr>
+<tr>
+<td>SourceB</td>
+<td>I</td>
+<td>32</td>
+<td>第二个操作数</td>
+</tr>
+<tr>
+<td>aluCtrl</td>
+<td>I</td>
+<td>3</td>
+<td>计算控制信号<br>000:与 001：或 <br>010:加 110：减</td>
+</tr>
+<tr>
+<td>ALUResult</td>
+<td>O</td>
+<td>32</td>
+<td>计算结果</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h3 id="1-3-6-DM"><a href="#1-3-6-DM" class="headerlink" title="1.3.6 DM"></a>1.3.6 DM</h3><p>该模块为数据存储单元，大小为3072*32 bits</p>
+<ul>
+<li>端口说明<table>
+<thead>
+<tr>
+<th>信号名</th>
+<th>方向</th>
+<th>位宽</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>clk</td>
+<td>I</td>
+<td>1</td>
+<td>时钟信号</td>
+</tr>
+<tr>
+<td>reset</td>
+<td>I</td>
+<td>1</td>
+<td>同步复位信号</td>
+</tr>
+<tr>
+<td>pc</td>
+<td>I</td>
+<td>32</td>
+<td>当前指令地址</td>
+</tr>
+<tr>
+<td>Addr</td>
+<td>I</td>
+<td>32</td>
+<td>需要读取&#x2F;写入的地址</td>
+</tr>
+<tr>
+<td>WD</td>
+<td>I</td>
+<td>32</td>
+<td>需要写入的数据</td>
+</tr>
+<tr>
+<td>ReadData</td>
+<td>O</td>
+<td>32</td>
+<td>从相应地址读取的数据</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h3 id="1-3-7-EXT"><a href="#1-3-7-EXT" class="headerlink" title="1.3.7 EXT"></a>1.3.7 EXT</h3><p>该模块通过位扩展信号对imm16进行位扩展<br><strong>注意：</strong>位拼接符的使用<code>&#123;&#123;16&#123;imm16[15]&#125;&#125;,imm16&#125;</code>,16外也有大括号，大括号的对应不要出错</p>
+<ul>
+<li>端口说明<table>
+<thead>
+<tr>
+<th>信号名</th>
+<th>方向</th>
+<th>位宽</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>imm16</td>
+<td>I</td>
+<td>16</td>
+<td>instr[15:0]</td>
+</tr>
+<tr>
+<td>EXTControl</td>
+<td>I</td>
+<td>2</td>
+<td>控制以何种方式位扩展</td>
+</tr>
+<tr>
+<td>immExtend</td>
+<td>O</td>
+<td>32</td>
+<td>扩展后的结果</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h3 id="1-3-8-Branch"><a href="#1-3-8-Branch" class="headerlink" title="1.3.8 Branch"></a>1.3.8 Branch</h3><p>该模块输出控制信号PCSource，决定是否实现B类指令的跳转</p>
+<ul>
+<li>端口说明<table>
+<thead>
+<tr>
+<th>信号名</th>
+<th>方向</th>
+<th>位宽</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>If_branch</td>
+<td>I</td>
+<td>1</td>
+<td>当前是否是B类指令</td>
+</tr>
+<tr>
+<td>ALUResult</td>
+<td>I</td>
+<td>32</td>
+<td>ALU的计算结果</td>
+</tr>
+<tr>
+<td>PCSource</td>
+<td>O</td>
+<td>1</td>
+<td>是否实现B类指令跳转</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h2 id="1-4-控制模块定义"><a href="#1-4-控制模块定义" class="headerlink" title="1.4 控制模块定义"></a>1.4 控制模块定义</h2><h3 id="1-4-1-Controller"><a href="#1-4-1-Controller" class="headerlink" title="1.4.1 Controller"></a>1.4.1 Controller</h3><p>该模块通过解码opcode和func来输出数据通路中的控制信号，主要分为and逻辑与or逻辑<br><strong>拓展：</strong>在and逻辑中增加相应的指令信号，在or逻辑中将需要置1的信号或上该指令信号。</p>
+<ul>
+<li>端口说明<table>
+<thead>
+<tr>
+<th>信号名</th>
+<th>方向</th>
+<th>位宽</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>opcode</td>
+<td>I</td>
+<td>6</td>
+<td>instr[31:26]</td>
+</tr>
+<tr>
+<td>func</td>
+<td>I</td>
+<td>6</td>
+<td>instr[5:0]</td>
+</tr>
+<tr>
+<td>Jump</td>
+<td>O</td>
+<td>1</td>
+<td>是否J型指令</td>
+</tr>
+<tr>
+<td>jr</td>
+<td>O</td>
+<td>1</td>
+<td>是否为jr指令</td>
+</tr>
+<tr>
+<td>RegDst</td>
+<td>O</td>
+<td>1</td>
+<td>0：rt <br> 1: rd</td>
+</tr>
+<tr>
+<td>raLink</td>
+<td>O</td>
+<td>1</td>
+<td>0: rt&#x2F;rd <br> 1: ra(31)</td>
+</tr>
+<tr>
+<td>aluSource</td>
+<td>O</td>
+<td>1</td>
+<td>0: RD2 <br> 1: immExtend</td>
+</tr>
+<tr>
+<td>Branch</td>
+<td>O</td>
+<td>1</td>
+<td>当前是否为B类指令</td>
+</tr>
+<tr>
+<td>MemtoReg</td>
+<td>O</td>
+<td>1</td>
+<td>0：ALUResult <br> 1:ReadData</td>
+</tr>
+<tr>
+<td>AddrTrans</td>
+<td>O</td>
+<td>1</td>
+<td>0: A&#x2F;R <br> 1:pc+4</td>
+</tr>
+<tr>
+<td>RegWrite</td>
+<td>O</td>
+<td>1</td>
+<td>GRF写使能信号</td>
+</tr>
+<tr>
+<td>MemWrite</td>
+<td>O</td>
+<td>1</td>
+<td>DM写使能信号</td>
+</tr>
+<tr>
+<td>EXTCtrl</td>
+<td>O</td>
+<td>2</td>
+<td>位扩展控制信号</td>
+</tr>
+<tr>
+<td>aluCtrl</td>
+<td>O</td>
+<td>3</td>
+<td>ALU控制信号</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h3 id="1-4-2-MUX"><a href="#1-4-2-MUX" class="headerlink" title="1.4.2 MUX"></a>1.4.2 MUX</h3><p>多个MUX模块放在同一个mux.v文件中。其实可以不写mux.v文件，遇到多路选择器可以直接用三目语句而不用示例化一个MUX。<br><strong>注意：</strong> 0,1一定要对应好！！！<br>mux_mforn</p>
+<ul>
+<li>端口说明<table>
+<thead>
+<tr>
+<th>信号名</th>
+<th>方向</th>
+<th>位宽</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>I</td>
+<td>n</td>
+<td>选择数据1</td>
+</tr>
+<tr>
+<td>B</td>
+<td>I</td>
+<td>n</td>
+<td>选择数据2</td>
+</tr>
+<tr>
+<td>sel</td>
+<td>I</td>
+<td>1</td>
+<td>选择信号</td>
+</tr>
+<tr>
+<td>result</td>
+<td>O</td>
+<td>n</td>
+<td>输出结果</td>
+</tr>
+</tbody></table>
+</li>
+</ul>
+<h1 id="2-测试方案"><a href="#2-测试方案" class="headerlink" title="2 测试方案"></a>2 测试方案</h1><h2 id="2-1-测试数据"><a href="#2-1-测试数据" class="headerlink" title="2.1 测试数据"></a>2.1 测试数据</h2><p>通过比较大的测试数据和与同学对拍进行测试。</p>
+<div class="highlight-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="code"><pre><span class="line"><span class="keyword">lui </span>$<span class="number">1</span>,<span class="number">0x64a1</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">1</span>,$<span class="number">1</span>,<span class="number">0x1ff8</span></span><br><span class="line"><span class="keyword">lui </span>$<span class="number">2</span>,<span class="number">0x5f21</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">2</span>,$<span class="number">2</span>,<span class="number">0x5205</span></span><br><span class="line"><span class="keyword">lui </span>$<span class="number">3</span>,<span class="number">0x1c6b</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">3</span>,$<span class="number">3</span>,<span class="number">0x7773</span></span><br><span class="line"><span class="comment"># ......</span></span><br><span class="line"><span class="comment"># 见testinstr.txt</span></span><br></pre></td></tr></table></figure></div>
+<p>机器码</p>
+<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">3c0164a1</span><br><span class="line">34211ff8</span><br><span class="line">3c025f21</span><br><span class="line">34425205</span><br><span class="line">3c031c6b</span><br><span class="line">34637773</span><br><span class="line">// ......</span><br><span class="line">// 见testcode_hex.txt</span><br></pre></td></tr></table></figure></div>
+<h1 id="3-可能的拓展"><a href="#3-可能的拓展" class="headerlink" title="3 可能的拓展"></a>3 可能的拓展</h1><h2 id="3-1-draft"><a href="#3-1-draft" class="headerlink" title="3.1 draft"></a>3.1 draft</h2><div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="comment">// lw/lh/lhu/lb/lbu</span></span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] temp = DM[Addr[<span class="number">11</span>:<span class="number">2</span>]] ;</span><br><span class="line">    <span class="keyword">always</span> @(*) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">case</span>(LoadOp)</span><br><span class="line">            `LS_LW: RD = temp;</span><br><span class="line">            `LS_LH: RD = (Addr[<span class="number">1</span>] == <span class="number">1&#x27;b0</span>) ? &#123;&#123;<span class="number">16</span>&#123;temp[<span class="number">15</span>]&#125;&#125;,temp[<span class="number">15</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">                                &#123;&#123;<span class="number">16</span>&#123;temp[<span class="number">31</span>]&#125;&#125;,temp[<span class="number">31</span>:<span class="number">16</span>]&#125;;</span><br><span class="line">            `LS_LHU: RD = (Addr[<span class="number">1</span>] == <span class="number">1&#x27;b0</span>) ? &#123;&#123;<span class="number">16</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;,temp[<span class="number">15</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">                                &#123;&#123;<span class="number">16</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;,temp[<span class="number">31</span>:<span class="number">16</span>]&#125;;</span><br><span class="line">            `LS_LB: RD = (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b00</span>) ? &#123;&#123;<span class="number">24</span>&#123;temp[<span class="number">7</span>]&#125;&#125;,temp[<span class="number">7</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">                                (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b01</span>) ? &#123;&#123;<span class="number">24</span>&#123;temp[<span class="number">15</span>]&#125;&#125;,temp[<span class="number">15</span>:<span class="number">8</span>]&#125; :</span><br><span class="line">                                (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b10</span>) ? &#123;&#123;<span class="number">24</span>&#123;temp[<span class="number">23</span>]&#125;&#125;,temp[<span class="number">23</span>:<span class="number">16</span>]&#125; :</span><br><span class="line">                                &#123;&#123;<span class="number">24</span>&#123;temp[<span class="number">31</span>]&#125;&#125;,temp[<span class="number">31</span>:<span class="number">24</span>]&#125;;</span><br><span class="line">            `LS_LBU: RD = (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b00</span>) ? &#123;&#123;<span class="number">24</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;,temp[<span class="number">7</span>:<span class="number">0</span>]&#125;:</span><br><span class="line">                                 (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b01</span>) ? &#123;&#123;<span class="number">24</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;,temp[<span class="number">15</span>:<span class="number">8</span>]&#125;:</span><br><span class="line">                                 (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b10</span>) ? &#123;&#123;<span class="number">24</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;,temp[<span class="number">23</span>:<span class="number">16</span>]&#125;:</span><br><span class="line">                                 &#123;&#123;<span class="number">24</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;,temp[<span class="number">31</span>:<span class="number">24</span>]&#125;;</span><br><span class="line">            <span class="keyword">default</span>: RD = temp;</span><br><span class="line">        <span class="keyword">endcase</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// sw/sh/sb</span></span><br><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk ) <span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">if</span> (reset) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">3072</span>; i = i + <span class="number">1</span>)<span class="keyword">begin</span></span><br><span class="line">            DM[i] = <span class="number">32&#x27;h0</span>;</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(MemWrite == <span class="number">1</span>) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">case</span>(StoreOp)</span><br><span class="line">            `LS_SW: DM[Addr[<span class="number">11</span>:<span class="number">2</span>]] &lt;= WD;</span><br><span class="line">            `LS_SH: DM[Addr[<span class="number">11</span>:<span class="number">2</span>]] &lt;=</span><br><span class="line">            (Addr[<span class="number">1</span>] == <span class="number">1&#x27;b0</span>) ? &#123;temp[<span class="number">31</span>:<span class="number">16</span>],WD[<span class="number">15</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">            &#123;WD[<span class="number">15</span>:<span class="number">0</span>],temp[<span class="number">15</span>:<span class="number">0</span>]&#125;;</span><br><span class="line">            `LS_SB: DM[Addr[<span class="number">11</span>:<span class="number">2</span>]] &lt;=</span><br><span class="line">            (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b00</span>) ? &#123;temp[<span class="number">31</span>:<span class="number">8</span>],WD[<span class="number">7</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">            (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b01</span>) ? &#123;temp[<span class="number">31</span>:<span class="number">16</span>],WD[<span class="number">7</span>:<span class="number">0</span>],temp[<span class="number">7</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">            (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b10</span>) ? &#123;temp[<span class="number">31</span>:<span class="number">24</span>],WD[<span class="number">7</span>:<span class="number">0</span>],temp[<span class="number">15</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">            &#123;WD[<span class="number">7</span>:<span class="number">0</span>],temp[<span class="number">23</span>:<span class="number">0</span>]&#125;;</span><br><span class="line">        <span class="keyword">default</span>: DM[Addr[<span class="number">11</span>:<span class="number">2</span>]] &lt;= DM[Addr[<span class="number">11</span>:<span class="number">2</span>]];</span><br><span class="line">        <span class="keyword">endcase</span></span><br><span class="line">    <span class="keyword">else</span> DM[Addr[<span class="number">11</span>:<span class="number">2</span>]] &lt;= DM[Addr[<span class="number">11</span>:<span class="number">2</span>]];</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//判断data中的1个数是否为奇数</span></span><br><span class="line"><span class="comment">//某位往届学长做法，类似于VotePlus的做法</span></span><br><span class="line"><span class="keyword">wire</span> odd;</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">31</span>:<span class="number">0</span>] num;</span><br><span class="line"><span class="keyword">initial</span> <span class="keyword">begin</span></span><br><span class="line">    num = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">integer</span> i;</span><br><span class="line"><span class="keyword">always</span> @(*) <span class="keyword">begin</span></span><br><span class="line">    num = <span class="number">0</span>;<span class="comment">//每次计算的时候num需要清零</span></span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">32</span>; i = i + <span class="number">1</span>) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span>(RegRead1[i] == <span class="number">1</span>) <span class="keyword">begin</span></span><br><span class="line">            num = num + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">assign</span> odd = num[<span class="number">0</span>];</span><br><span class="line"><span class="comment">//我的想法（和奇偶校验做法一样）</span></span><br><span class="line"><span class="keyword">wire</span> odd;</span><br><span class="line"><span class="keyword">assign</span> odd = ^RegRead1;</span><br><span class="line"></span><br><span class="line"><span class="comment">//“字对齐”输出,即要求必须是4的倍数，而我们原来输出的都是byte的地址</span></span><br><span class="line">$display$display(<span class="string">&quot;@%h: *%h &lt;= %h&quot;</span>,pc,&#123;MemAddr[<span class="number">31</span>:<span class="number">2</span>],&#123;<span class="number">2</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;&#125;,WD);</span><br><span class="line"></span><br><span class="line"><span class="comment">//判断data后缀0个数</span></span><br><span class="line"><span class="comment">//while</span></span><br><span class="line"><span class="keyword">reg</span> [<span class="number">31</span>:<span class="number">0</span>] num ;</span><br><span class="line"><span class="keyword">initial</span> <span class="keyword">begin</span></span><br><span class="line">    num = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">integer</span> i;</span><br><span class="line"><span class="keyword">always</span> @(*) <span class="keyword">begin</span></span><br><span class="line">    num = <span class="number">0</span>;</span><br><span class="line">    i = <span class="number">0</span>;<span class="comment">//initial</span></span><br><span class="line">    <span class="keyword">while</span> ((i &lt; <span class="number">32</span>) &amp;&amp; (RegRead1[i] == <span class="number">0</span>)) <span class="keyword">begin</span></span><br><span class="line">        num = num + <span class="number">1</span>;</span><br><span class="line">        i = i + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="comment">//for</span></span><br><span class="line"><span class="keyword">always</span> @(*) <span class="keyword">begin</span></span><br><span class="line">    num = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>;(i &lt; <span class="number">32</span>) &amp;&amp; (RegRead1[i] == <span class="number">0</span>); i = i + <span class="number">1</span>) <span class="keyword">begin</span></span><br><span class="line">        num = num + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+<h2 id="3-2-其他拓展思考"><a href="#3-2-其他拓展思考" class="headerlink" title="3.2 其他拓展思考"></a>3.2 其他拓展思考</h2><ol>
+<li>主要修改ALU模块和Controller模块</li>
+<li>对于半字&#x2F;字节读取等，在DM模块做出相应修改</li>
+<li>读好RTL，列出信号的0，1情况，认真</li>
+</ol>
+<h1 id="4-思考题解答"><a href="#4-思考题解答" class="headerlink" title="4 思考题解答"></a>4 思考题解答</h1><ol>
+<li>阅读下面给出的 DM 的输入示例中（示例 DM 容量为 4KB，即 32bit × 1024字），根据你的理解回答，这个 addr 信号又是从哪里来的？地址信号 addr 位数为什么是 [11:2] 而不是 [9:0] ？<br>答：addr信号是上一个模块ALU计算出的ALUResult（当然根据每条指令RTL的不同，也可能是其他模块的输出结果）。因为DM是以字（32bits）为单位存储，而addr是以字节（8bits）为单位计数,因此2^12(Byte)&#x2F;2^2 &#x3D; 2^10,去掉addr的最低两位(表示字节)，取addr[11:2]。</li>
+<li>思考上述两种控制器设计的译码方式，给出代码示例，并尝试对比各方式的优劣。<div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="comment">//指令对应的控制信号如何取值</span></span><br><span class="line"><span class="keyword">always</span> @(*) </span><br><span class="line">    <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span> (add) <span class="keyword">begin</span></span><br><span class="line">            RegDst = <span class="number">1</span>;</span><br><span class="line">            RegWrite = <span class="number">1</span>;</span><br><span class="line">            ALUCtrl = <span class="number">3&#x27;b010</span>;</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (sub) <span class="keyword">begin</span></span><br><span class="line">            <span class="comment">//......</span></span><br><span class="line">        <span class="keyword">end</span>   </span><br><span class="line">        <span class="comment">//......   </span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="comment">//控制信号所对应的指令</span></span><br><span class="line"><span class="keyword">assign</span> Jump = jal | jr;</span><br><span class="line"><span class="keyword">assign</span> RegDst = add | sub;</span><br><span class="line"><span class="comment">//......</span></span><br></pre></td></tr></table></figure></div>
+第一种译码方式方便清楚每一个指令对应的控制信号，但书写代码量较大。第二种译码方式代码书写量较小，但需要注意的是，增加新的指令时，各种控制信号的增改勿重勿漏。</li>
+<li>在相应的部件中，复位信号的设计都是同步复位，这与 P3 中的设计要求不同。请对比同步复位与异步复位这两种方式的 reset 信号与 clk 信号优先级的关系。<br>答：同步复位clk信号优先级更高，异步复位reset信号优先级更高。</li>
+</ol>
+<h1 id="祝P4上机一切顺利！"><a href="#祝P4上机一切顺利！" class="headerlink" title="祝P4上机一切顺利！"></a>祝P4上机一切顺利！</h1><h1 id="P4-review"><a href="#P4-review" class="headerlink" title="P4_review"></a>P4_review</h1><h2 id="写在前面：Verilog就是很容易出小问题"><a href="#写在前面：Verilog就是很容易出小问题" class="headerlink" title="写在前面：Verilog就是很容易出小问题"></a>写在前面：Verilog就是很容易出小问题</h2><ol>
+<li>是否有符号数，注意<code>$signed</code></li>
+<li>多加括号，勤加括号</li>
+<li>判断条件写成<code>temp32 != temp32</code>,我是笨蛋</li>
+<li>不要慌乱，把子模块的信号什么都加好</li>
+<li>祝流水线顺利！</li>
+</ol>
+]]></content>
+      <categories>
+        <category>BUAA_CO</category>
+      </categories>
+      <tags>
+        <tag>BUAA_CO</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>P3</title>
     <url>/2023/01/02/P3/</url>
     <content><![CDATA[<h1 id="P3-Study"><a href="#P3-Study" class="headerlink" title="P3_Study"></a>P3_Study</h1><h1 id="1-单周期CPU设计方案"><a href="#1-单周期CPU设计方案" class="headerlink" title="1 单周期CPU设计方案"></a>1 单周期CPU设计方案</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所呈现的是利用logisim实现的MIPS架构CPU，可以支持8条指令，含有IFU、GRF、ALU、DM、Controller、BranchControl、EXT、NPC模块。整体设计实现采用自下而上的设计思路，先逐一设计搭建每个子模块，再将所有子模块整合连接，从而实现完整的数据通路。<br>CPU顶层模块如下：<br><img  
@@ -1048,647 +1689,6 @@
 <li>需要注意的是，课上的MARS需要导入新的指令，setting -&gt; load instruction，将下载的class.h文件导入。手写测试机器码真的太蠢了。</li>
 </ol>
 <h1 id="再接再励！一口气干到P8！"><a href="#再接再励！一口气干到P8！" class="headerlink" title="再接再励！一口气干到P8！"></a>再接再励！一口气干到P8！</h1>]]></content>
-      <categories>
-        <category>BUAA_CO</category>
-      </categories>
-      <tags>
-        <tag>BUAA_CO</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>P4</title>
-    <url>/2023/01/02/P4/</url>
-    <content><![CDATA[<h1 id="P4-Study"><a href="#P4-Study" class="headerlink" title="P4_Study"></a>P4_Study</h1><h1 id="1-单周期CPU设计方案（Verilog实现）"><a href="#1-单周期CPU设计方案（Verilog实现）" class="headerlink" title="1 单周期CPU设计方案（Verilog实现）"></a>1 单周期CPU设计方案（Verilog实现）</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所呈现的是利用Verilog实现的MIPS架构CPU，可以支持10条指令，含有PC、NPC、IM、GRF、ALU、DM、Controller、EXT、Branch模块。整体采用自下而上的设计思路。</p>
-<h2 id="1-2-实现指令说明"><a href="#1-2-实现指令说明" class="headerlink" title="1.2 实现指令说明"></a>1.2 实现指令说明</h2><h3 id="1-2-1-R型指令"><a href="#1-2-1-R型指令" class="headerlink" title="1.2.1 R型指令"></a>1.2.1 R型指令</h3><p>算术指令：add(暂视为不做溢出检查)，sub（暂视为不做溢出检查）<br>跳转指令：jr</p>
-<h3 id="1-2-2-I型指令"><a href="#1-2-2-I型指令" class="headerlink" title="1.2.2 I型指令"></a>1.2.2 I型指令</h3><p>B类指令：beq<br>算术指令：lui，ori<br>访存指令：lw，sw</p>
-<h3 id="1-2-3-J型指令"><a href="#1-2-3-J型指令" class="headerlink" title="1.2.3 J型指令"></a>1.2.3 J型指令</h3><p>跳转指令：jal</p>
-<h3 id="1-2-4-其他"><a href="#1-2-4-其他" class="headerlink" title="1.2.4 其他"></a>1.2.4 其他</h3><p>nop</p>
-<h2 id="1-3-数据通路模块定义"><a href="#1-3-数据通路模块定义" class="headerlink" title="1.3 数据通路模块定义"></a>1.3 数据通路模块定义</h2><h3 id="1-3-1-PC"><a href="#1-3-1-PC" class="headerlink" title="1.3.1 PC"></a>1.3.1 PC</h3><p>该模块包含一个32位寄存器用于存储当前执行的指令地址，考虑到可综合性，不用添加initial模块，通过tb里的reset来实现initial。<br><strong>注意：</strong> 指令地址从0x0000_3000开始</p>
-<ul>
-<li>端口定义<table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>clk</td>
-<td>I</td>
-<td>1</td>
-<td>时钟信号</td>
-</tr>
-<tr>
-<td>reset</td>
-<td>I</td>
-<td>1</td>
-<td>同步复位信号</td>
-</tr>
-<tr>
-<td>NPC</td>
-<td>I</td>
-<td>32</td>
-<td>下一条指令地址</td>
-</tr>
-<tr>
-<td>PC</td>
-<td>O</td>
-<td>32</td>
-<td>当前指令地址</td>
-</tr>
-</tbody></table>
-</li>
-<li>功能定义<table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>功能描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>同步复位</td>
-<td>时钟上升沿到来时，如果reset信号有效，地址置为0x0000_3000</td>
-</tr>
-<tr>
-<td>2</td>
-<td>写入NPC</td>
-<td>将下一条指令地址NPC写入寄存器</td>
-</tr>
-</tbody></table>
-</li>
-</ul>
-<h3 id="1-3-2-NPC"><a href="#1-3-2-NPC" class="headerlink" title="1.3.2 NPC"></a>1.3.2 NPC</h3><p>该模块为逻辑运算，通过选择信号和当前指令计算出下一条指令地址</p>
-<ul>
-<li>端口定义  <table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>pc</td>
-<td>I</td>
-<td>32</td>
-<td>当前指令地址</td>
-</tr>
-<tr>
-<td>imm16</td>
-<td>I</td>
-<td>16</td>
-<td>instr[15:0]</td>
-</tr>
-<tr>
-<td>imm26</td>
-<td>I</td>
-<td>26</td>
-<td>instr[25:0]</td>
-</tr>
-<tr>
-<td>ra</td>
-<td>I</td>
-<td>32</td>
-<td>GPR[ra] (也可以是其他寄存器的内容)</td>
-</tr>
-<tr>
-<td>PCCtrl</td>
-<td>I</td>
-<td>1</td>
-<td>0 ：选择pc+4 <br> 1 ：选择beq所对应的npc</td>
-</tr>
-<tr>
-<td>Jump</td>
-<td>I</td>
-<td>1</td>
-<td>0:不是jr&#x2F;jal指令 <br> 1:是jr&#x2F;jal指令</td>
-</tr>
-<tr>
-<td>jr</td>
-<td>I</td>
-<td>1</td>
-<td>0：不是jr指令 <br> 1:是jr指令</td>
-</tr>
-</tbody></table>
-</li>
-<li>B类与J类指令实现机制<br>通过mux实现对npc的输出选择<br><strong>注意：</strong><br>弄清楚mux的0、1对应</li>
-</ul>
-<h3 id="1-3-3-IM"><a href="#1-3-3-IM" class="headerlink" title="1.3.3 IM"></a>1.3.3 IM</h3><p>该模块为指令存储单元，大小为4096*32 bits<br><strong>注意：</strong>  </p>
-<ol>
-<li>ROM为只读存储器，reset时其中数据不清零</li>
-<li>pc默认是从0x0000_3000开始，故使用pc在ROM中索引相应指令时应为<code>temp = pc - 32&#39;h0000_3000</code></li>
-<li>ROM容量为2^12，故<code>addr = temp[13:2]</code></li>
-<li>利用系统调用函数读取指令信息<div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="keyword">initial</span> <span class="keyword">begin</span></span><br><span class="line">        <span class="built_in">$readmemh</span>(<span class="string">&quot;code.txt&quot;</span>,rom);</span><br><span class="line">    <span class="keyword">end</span></span><br></pre></td></tr></table></figure></div></li>
-</ol>
-<ul>
-<li>端口定义<table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>clk</td>
-<td>I</td>
-<td>1</td>
-<td>时钟信号</td>
-</tr>
-<tr>
-<td>reset</td>
-<td>I</td>
-<td>1</td>
-<td>同步复位信号</td>
-</tr>
-<tr>
-<td>pc</td>
-<td>I</td>
-<td>32</td>
-<td>当前指令地址</td>
-</tr>
-<tr>
-<td>opcode</td>
-<td>O</td>
-<td>6</td>
-<td>instr[31：26]</td>
-</tr>
-<tr>
-<td>func</td>
-<td>O</td>
-<td>6</td>
-<td>instr[5:0]</td>
-</tr>
-<tr>
-<td>rs</td>
-<td>O</td>
-<td>6</td>
-<td>instr[25:21]</td>
-</tr>
-<tr>
-<td>rt</td>
-<td>O</td>
-<td>6</td>
-<td>instr[20:16]</td>
-</tr>
-<tr>
-<td>rd</td>
-<td>O</td>
-<td>6</td>
-<td>instr[15:11]</td>
-</tr>
-<tr>
-<td>imm16</td>
-<td>O</td>
-<td>16</td>
-<td>imm16[15:0]</td>
-</tr>
-<tr>
-<td>imm26</td>
-<td>O</td>
-<td>26</td>
-<td>imm26[25:0]</td>
-</tr>
-</tbody></table>
-</li>
-<li>功能定义<table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>功能描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>取指令</td>
-<td>根据pc在ROM中取出相应指令</td>
-</tr>
-<tr>
-<td>2</td>
-<td>取数据</td>
-<td>splitter行为，取出instr不同位所拥有的信息</td>
-</tr>
-</tbody></table>
-</li>
-</ul>
-<h3 id="1-3-4-GRF"><a href="#1-3-4-GRF" class="headerlink" title="1.3.4 GRF"></a>1.3.4 GRF</h3><p>该模块包含32个32位寄存器，对应MIPS架构中$0~$31通用寄存器，可以通过输入的5位地址访存寄存器，其中，$0寄存器设置写入信息为const0。</p>
-<ul>
-<li>端口定义<table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>clk</td>
-<td>I</td>
-<td>1</td>
-<td>时钟信号</td>
-</tr>
-<tr>
-<td>reset</td>
-<td>I</td>
-<td>1</td>
-<td>同步复位信号</td>
-</tr>
-<tr>
-<td>A1</td>
-<td>I</td>
-<td>5</td>
-<td>需要读取的第一个寄存器编号</td>
-</tr>
-<tr>
-<td>A2</td>
-<td>I</td>
-<td>5</td>
-<td>需要读取的第二个寄存器编号</td>
-</tr>
-<tr>
-<td>A3</td>
-<td>I</td>
-<td>5</td>
-<td>需要写入的寄存器编号</td>
-</tr>
-<tr>
-<td>pc</td>
-<td>I</td>
-<td>32</td>
-<td>当前指令的地址</td>
-</tr>
-<tr>
-<td>Data</td>
-<td>I</td>
-<td>32</td>
-<td>需要写入的数据</td>
-</tr>
-<tr>
-<td>RegWrite</td>
-<td>I</td>
-<td>1</td>
-<td>写使能信号</td>
-</tr>
-<tr>
-<td>RD1</td>
-<td>O</td>
-<td>32</td>
-<td>读取的第一个寄存器数据</td>
-</tr>
-<tr>
-<td>RD2</td>
-<td>O</td>
-<td>32</td>
-<td>读取的第二个寄存器数据</td>
-</tr>
-</tbody></table>
-</li>
-<li>功能定义<table>
-<thead>
-<tr>
-<th>序号</th>
-<th>功能名称</th>
-<th>功能描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>1</td>
-<td>同步复位</td>
-<td>当时钟上升沿到来，若reset信号有效，寄存器全部置0</td>
-</tr>
-<tr>
-<td>2</td>
-<td>读取寄存器</td>
-<td>根据寄存器编号读取寄存器内容</td>
-</tr>
-<tr>
-<td>3</td>
-<td>写寄存器</td>
-<td>根据寄存器编号、写使能信号、写入数据，向相应寄存器写入数据</td>
-</tr>
-</tbody></table>
-</li>
-</ul>
-<h3 id="1-3-5-ALU"><a href="#1-3-5-ALU" class="headerlink" title="1.3.5 ALU"></a>1.3.5 ALU</h3><p>该模块通过计算控制信号aluCtrl实现计算</p>
-<ul>
-<li>端口说明<table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>SourceA</td>
-<td>I</td>
-<td>32</td>
-<td>第一个操作数</td>
-</tr>
-<tr>
-<td>SourceB</td>
-<td>I</td>
-<td>32</td>
-<td>第二个操作数</td>
-</tr>
-<tr>
-<td>aluCtrl</td>
-<td>I</td>
-<td>3</td>
-<td>计算控制信号<br>000:与 001：或 <br>010:加 110：减</td>
-</tr>
-<tr>
-<td>ALUResult</td>
-<td>O</td>
-<td>32</td>
-<td>计算结果</td>
-</tr>
-</tbody></table>
-</li>
-</ul>
-<h3 id="1-3-6-DM"><a href="#1-3-6-DM" class="headerlink" title="1.3.6 DM"></a>1.3.6 DM</h3><p>该模块为数据存储单元，大小为3072*32 bits</p>
-<ul>
-<li>端口说明<table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>clk</td>
-<td>I</td>
-<td>1</td>
-<td>时钟信号</td>
-</tr>
-<tr>
-<td>reset</td>
-<td>I</td>
-<td>1</td>
-<td>同步复位信号</td>
-</tr>
-<tr>
-<td>pc</td>
-<td>I</td>
-<td>32</td>
-<td>当前指令地址</td>
-</tr>
-<tr>
-<td>Addr</td>
-<td>I</td>
-<td>32</td>
-<td>需要读取&#x2F;写入的地址</td>
-</tr>
-<tr>
-<td>WD</td>
-<td>I</td>
-<td>32</td>
-<td>需要写入的数据</td>
-</tr>
-<tr>
-<td>ReadData</td>
-<td>O</td>
-<td>32</td>
-<td>从相应地址读取的数据</td>
-</tr>
-</tbody></table>
-</li>
-</ul>
-<h3 id="1-3-7-EXT"><a href="#1-3-7-EXT" class="headerlink" title="1.3.7 EXT"></a>1.3.7 EXT</h3><p>该模块通过位扩展信号对imm16进行位扩展<br><strong>注意：</strong>位拼接符的使用<code>&#123;&#123;16&#123;imm16[15]&#125;&#125;,imm16&#125;</code>,16外也有大括号，大括号的对应不要出错</p>
-<ul>
-<li>端口说明<table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>imm16</td>
-<td>I</td>
-<td>16</td>
-<td>instr[15:0]</td>
-</tr>
-<tr>
-<td>EXTControl</td>
-<td>I</td>
-<td>2</td>
-<td>控制以何种方式位扩展</td>
-</tr>
-<tr>
-<td>immExtend</td>
-<td>O</td>
-<td>32</td>
-<td>扩展后的结果</td>
-</tr>
-</tbody></table>
-</li>
-</ul>
-<h3 id="1-3-8-Branch"><a href="#1-3-8-Branch" class="headerlink" title="1.3.8 Branch"></a>1.3.8 Branch</h3><p>该模块输出控制信号PCSource，决定是否实现B类指令的跳转</p>
-<ul>
-<li>端口说明<table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>If_branch</td>
-<td>I</td>
-<td>1</td>
-<td>当前是否是B类指令</td>
-</tr>
-<tr>
-<td>ALUResult</td>
-<td>I</td>
-<td>32</td>
-<td>ALU的计算结果</td>
-</tr>
-<tr>
-<td>PCSource</td>
-<td>O</td>
-<td>1</td>
-<td>是否实现B类指令跳转</td>
-</tr>
-</tbody></table>
-</li>
-</ul>
-<h2 id="1-4-控制模块定义"><a href="#1-4-控制模块定义" class="headerlink" title="1.4 控制模块定义"></a>1.4 控制模块定义</h2><h3 id="1-4-1-Controller"><a href="#1-4-1-Controller" class="headerlink" title="1.4.1 Controller"></a>1.4.1 Controller</h3><p>该模块通过解码opcode和func来输出数据通路中的控制信号，主要分为and逻辑与or逻辑<br><strong>拓展：</strong>在and逻辑中增加相应的指令信号，在or逻辑中将需要置1的信号或上该指令信号。</p>
-<ul>
-<li>端口说明<table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>opcode</td>
-<td>I</td>
-<td>6</td>
-<td>instr[31:26]</td>
-</tr>
-<tr>
-<td>func</td>
-<td>I</td>
-<td>6</td>
-<td>instr[5:0]</td>
-</tr>
-<tr>
-<td>Jump</td>
-<td>O</td>
-<td>1</td>
-<td>是否J型指令</td>
-</tr>
-<tr>
-<td>jr</td>
-<td>O</td>
-<td>1</td>
-<td>是否为jr指令</td>
-</tr>
-<tr>
-<td>RegDst</td>
-<td>O</td>
-<td>1</td>
-<td>0：rt <br> 1: rd</td>
-</tr>
-<tr>
-<td>raLink</td>
-<td>O</td>
-<td>1</td>
-<td>0: rt&#x2F;rd <br> 1: ra(31)</td>
-</tr>
-<tr>
-<td>aluSource</td>
-<td>O</td>
-<td>1</td>
-<td>0: RD2 <br> 1: immExtend</td>
-</tr>
-<tr>
-<td>Branch</td>
-<td>O</td>
-<td>1</td>
-<td>当前是否为B类指令</td>
-</tr>
-<tr>
-<td>MemtoReg</td>
-<td>O</td>
-<td>1</td>
-<td>0：ALUResult <br> 1:ReadData</td>
-</tr>
-<tr>
-<td>AddrTrans</td>
-<td>O</td>
-<td>1</td>
-<td>0: A&#x2F;R <br> 1:pc+4</td>
-</tr>
-<tr>
-<td>RegWrite</td>
-<td>O</td>
-<td>1</td>
-<td>GRF写使能信号</td>
-</tr>
-<tr>
-<td>MemWrite</td>
-<td>O</td>
-<td>1</td>
-<td>DM写使能信号</td>
-</tr>
-<tr>
-<td>EXTCtrl</td>
-<td>O</td>
-<td>2</td>
-<td>位扩展控制信号</td>
-</tr>
-<tr>
-<td>aluCtrl</td>
-<td>O</td>
-<td>3</td>
-<td>ALU控制信号</td>
-</tr>
-</tbody></table>
-</li>
-</ul>
-<h3 id="1-4-2-MUX"><a href="#1-4-2-MUX" class="headerlink" title="1.4.2 MUX"></a>1.4.2 MUX</h3><p>多个MUX模块放在同一个mux.v文件中。其实可以不写mux.v文件，遇到多路选择器可以直接用三目语句而不用示例化一个MUX。<br><strong>注意：</strong> 0,1一定要对应好！！！<br>mux_mforn</p>
-<ul>
-<li>端口说明<table>
-<thead>
-<tr>
-<th>信号名</th>
-<th>方向</th>
-<th>位宽</th>
-<th>描述</th>
-</tr>
-</thead>
-<tbody><tr>
-<td>A</td>
-<td>I</td>
-<td>n</td>
-<td>选择数据1</td>
-</tr>
-<tr>
-<td>B</td>
-<td>I</td>
-<td>n</td>
-<td>选择数据2</td>
-</tr>
-<tr>
-<td>sel</td>
-<td>I</td>
-<td>1</td>
-<td>选择信号</td>
-</tr>
-<tr>
-<td>result</td>
-<td>O</td>
-<td>n</td>
-<td>输出结果</td>
-</tr>
-</tbody></table>
-</li>
-</ul>
-<h1 id="2-测试方案"><a href="#2-测试方案" class="headerlink" title="2 测试方案"></a>2 测试方案</h1><h2 id="2-1-测试数据"><a href="#2-1-测试数据" class="headerlink" title="2.1 测试数据"></a>2.1 测试数据</h2><p>通过比较大的测试数据和与同学对拍进行测试。</p>
-<div class="highlight-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="code"><pre><span class="line"><span class="keyword">lui </span>$<span class="number">1</span>,<span class="number">0x64a1</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">1</span>,$<span class="number">1</span>,<span class="number">0x1ff8</span></span><br><span class="line"><span class="keyword">lui </span>$<span class="number">2</span>,<span class="number">0x5f21</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">2</span>,$<span class="number">2</span>,<span class="number">0x5205</span></span><br><span class="line"><span class="keyword">lui </span>$<span class="number">3</span>,<span class="number">0x1c6b</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="number">3</span>,$<span class="number">3</span>,<span class="number">0x7773</span></span><br><span class="line"><span class="comment"># ......</span></span><br><span class="line"><span class="comment"># 见testinstr.txt</span></span><br></pre></td></tr></table></figure></div>
-<p>机器码</p>
-<div class="highlight-container" data-rel="Plaintext"><figure class="iseeu highlight plaintext"><table><tr><td class="code"><pre><span class="line">3c0164a1</span><br><span class="line">34211ff8</span><br><span class="line">3c025f21</span><br><span class="line">34425205</span><br><span class="line">3c031c6b</span><br><span class="line">34637773</span><br><span class="line">// ......</span><br><span class="line">// 见testcode_hex.txt</span><br></pre></td></tr></table></figure></div>
-<h1 id="3-可能的拓展"><a href="#3-可能的拓展" class="headerlink" title="3 可能的拓展"></a>3 可能的拓展</h1><h2 id="3-1-draft"><a href="#3-1-draft" class="headerlink" title="3.1 draft"></a>3.1 draft</h2><div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="comment">// lw/lh/lhu/lb/lbu</span></span><br><span class="line"><span class="keyword">wire</span> [<span class="number">31</span>:<span class="number">0</span>] temp = DM[Addr[<span class="number">11</span>:<span class="number">2</span>]] ;</span><br><span class="line">    <span class="keyword">always</span> @(*) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">case</span>(LoadOp)</span><br><span class="line">            `LS_LW: RD = temp;</span><br><span class="line">            `LS_LH: RD = (Addr[<span class="number">1</span>] == <span class="number">1&#x27;b0</span>) ? &#123;&#123;<span class="number">16</span>&#123;temp[<span class="number">15</span>]&#125;&#125;,temp[<span class="number">15</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">                                &#123;&#123;<span class="number">16</span>&#123;temp[<span class="number">31</span>]&#125;&#125;,temp[<span class="number">31</span>:<span class="number">16</span>]&#125;;</span><br><span class="line">            `LS_LHU: RD = (Addr[<span class="number">1</span>] == <span class="number">1&#x27;b0</span>) ? &#123;&#123;<span class="number">16</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;,temp[<span class="number">15</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">                                &#123;&#123;<span class="number">16</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;,temp[<span class="number">31</span>:<span class="number">16</span>]&#125;;</span><br><span class="line">            `LS_LB: RD = (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b00</span>) ? &#123;&#123;<span class="number">24</span>&#123;temp[<span class="number">7</span>]&#125;&#125;,temp[<span class="number">7</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">                                (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b01</span>) ? &#123;&#123;<span class="number">24</span>&#123;temp[<span class="number">15</span>]&#125;&#125;,temp[<span class="number">15</span>:<span class="number">8</span>]&#125; :</span><br><span class="line">                                (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b10</span>) ? &#123;&#123;<span class="number">24</span>&#123;temp[<span class="number">23</span>]&#125;&#125;,temp[<span class="number">23</span>:<span class="number">16</span>]&#125; :</span><br><span class="line">                                &#123;&#123;<span class="number">24</span>&#123;temp[<span class="number">31</span>]&#125;&#125;,temp[<span class="number">31</span>:<span class="number">24</span>]&#125;;</span><br><span class="line">            `LS_LBU: RD = (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b00</span>) ? &#123;&#123;<span class="number">24</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;,temp[<span class="number">7</span>:<span class="number">0</span>]&#125;:</span><br><span class="line">                                 (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b01</span>) ? &#123;&#123;<span class="number">24</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;,temp[<span class="number">15</span>:<span class="number">8</span>]&#125;:</span><br><span class="line">                                 (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b10</span>) ? &#123;&#123;<span class="number">24</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;,temp[<span class="number">23</span>:<span class="number">16</span>]&#125;:</span><br><span class="line">                                 &#123;&#123;<span class="number">24</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;,temp[<span class="number">31</span>:<span class="number">24</span>]&#125;;</span><br><span class="line">            <span class="keyword">default</span>: RD = temp;</span><br><span class="line">        <span class="keyword">endcase</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// sw/sh/sb</span></span><br><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk ) <span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">if</span> (reset) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">3072</span>; i = i + <span class="number">1</span>)<span class="keyword">begin</span></span><br><span class="line">            DM[i] = <span class="number">32&#x27;h0</span>;</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span>(MemWrite == <span class="number">1</span>) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">case</span>(StoreOp)</span><br><span class="line">            `LS_SW: DM[Addr[<span class="number">11</span>:<span class="number">2</span>]] &lt;= WD;</span><br><span class="line">            `LS_SH: DM[Addr[<span class="number">11</span>:<span class="number">2</span>]] &lt;=</span><br><span class="line">            (Addr[<span class="number">1</span>] == <span class="number">1&#x27;b0</span>) ? &#123;temp[<span class="number">31</span>:<span class="number">16</span>],WD[<span class="number">15</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">            &#123;WD[<span class="number">15</span>:<span class="number">0</span>],temp[<span class="number">15</span>:<span class="number">0</span>]&#125;;</span><br><span class="line">            `LS_SB: DM[Addr[<span class="number">11</span>:<span class="number">2</span>]] &lt;=</span><br><span class="line">            (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b00</span>) ? &#123;temp[<span class="number">31</span>:<span class="number">8</span>],WD[<span class="number">7</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">            (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b01</span>) ? &#123;temp[<span class="number">31</span>:<span class="number">16</span>],WD[<span class="number">7</span>:<span class="number">0</span>],temp[<span class="number">7</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">            (Addr[<span class="number">1</span>:<span class="number">0</span>] == <span class="number">2&#x27;b10</span>) ? &#123;temp[<span class="number">31</span>:<span class="number">24</span>],WD[<span class="number">7</span>:<span class="number">0</span>],temp[<span class="number">15</span>:<span class="number">0</span>]&#125; :</span><br><span class="line">            &#123;WD[<span class="number">7</span>:<span class="number">0</span>],temp[<span class="number">23</span>:<span class="number">0</span>]&#125;;</span><br><span class="line">        <span class="keyword">default</span>: DM[Addr[<span class="number">11</span>:<span class="number">2</span>]] &lt;= DM[Addr[<span class="number">11</span>:<span class="number">2</span>]];</span><br><span class="line">        <span class="keyword">endcase</span></span><br><span class="line">    <span class="keyword">else</span> DM[Addr[<span class="number">11</span>:<span class="number">2</span>]] &lt;= DM[Addr[<span class="number">11</span>:<span class="number">2</span>]];</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">//判断data中的1个数是否为奇数</span></span><br><span class="line"><span class="comment">//某位往届学长做法，类似于VotePlus的做法</span></span><br><span class="line"><span class="keyword">wire</span> odd;</span><br><span class="line"><span class="keyword">reg</span> [<span class="number">31</span>:<span class="number">0</span>] num;</span><br><span class="line"><span class="keyword">initial</span> <span class="keyword">begin</span></span><br><span class="line">    num = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">integer</span> i;</span><br><span class="line"><span class="keyword">always</span> @(*) <span class="keyword">begin</span></span><br><span class="line">    num = <span class="number">0</span>;<span class="comment">//每次计算的时候num需要清零</span></span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>; i &lt; <span class="number">32</span>; i = i + <span class="number">1</span>) <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span>(RegRead1[i] == <span class="number">1</span>) <span class="keyword">begin</span></span><br><span class="line">            num = num + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">assign</span> odd = num[<span class="number">0</span>];</span><br><span class="line"><span class="comment">//我的想法（和奇偶校验做法一样）</span></span><br><span class="line"><span class="keyword">wire</span> odd;</span><br><span class="line"><span class="keyword">assign</span> odd = ^RegRead1;</span><br><span class="line"></span><br><span class="line"><span class="comment">//“字对齐”输出,即要求必须是4的倍数，而我们原来输出的都是byte的地址</span></span><br><span class="line">$display$display(<span class="string">&quot;@%h: *%h &lt;= %h&quot;</span>,pc,&#123;MemAddr[<span class="number">31</span>:<span class="number">2</span>],&#123;<span class="number">2</span>&#123;<span class="number">1&#x27;b0</span>&#125;&#125;&#125;,WD);</span><br><span class="line"></span><br><span class="line"><span class="comment">//判断data后缀0个数</span></span><br><span class="line"><span class="comment">//while</span></span><br><span class="line"><span class="keyword">reg</span> [<span class="number">31</span>:<span class="number">0</span>] num ;</span><br><span class="line"><span class="keyword">initial</span> <span class="keyword">begin</span></span><br><span class="line">    num = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="keyword">integer</span> i;</span><br><span class="line"><span class="keyword">always</span> @(*) <span class="keyword">begin</span></span><br><span class="line">    num = <span class="number">0</span>;</span><br><span class="line">    i = <span class="number">0</span>;<span class="comment">//initial</span></span><br><span class="line">    <span class="keyword">while</span> ((i &lt; <span class="number">32</span>) &amp;&amp; (RegRead1[i] == <span class="number">0</span>)) <span class="keyword">begin</span></span><br><span class="line">        num = num + <span class="number">1</span>;</span><br><span class="line">        i = i + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"><span class="comment">//for</span></span><br><span class="line"><span class="keyword">always</span> @(*) <span class="keyword">begin</span></span><br><span class="line">    num = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(i = <span class="number">0</span>;(i &lt; <span class="number">32</span>) &amp;&amp; (RegRead1[i] == <span class="number">0</span>); i = i + <span class="number">1</span>) <span class="keyword">begin</span></span><br><span class="line">        num = num + <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-<h2 id="3-2-其他拓展思考"><a href="#3-2-其他拓展思考" class="headerlink" title="3.2 其他拓展思考"></a>3.2 其他拓展思考</h2><ol>
-<li>主要修改ALU模块和Controller模块</li>
-<li>对于半字&#x2F;字节读取等，在DM模块做出相应修改</li>
-<li>读好RTL，列出信号的0，1情况，认真</li>
-</ol>
-<h1 id="4-思考题解答"><a href="#4-思考题解答" class="headerlink" title="4 思考题解答"></a>4 思考题解答</h1><ol>
-<li>阅读下面给出的 DM 的输入示例中（示例 DM 容量为 4KB，即 32bit × 1024字），根据你的理解回答，这个 addr 信号又是从哪里来的？地址信号 addr 位数为什么是 [11:2] 而不是 [9:0] ？<br>答：addr信号是上一个模块ALU计算出的ALUResult（当然根据每条指令RTL的不同，也可能是其他模块的输出结果）。因为DM是以字（32bits）为单位存储，而addr是以字节（8bits）为单位计数,因此2^12(Byte)&#x2F;2^2 &#x3D; 2^10,去掉addr的最低两位(表示字节)，取addr[11:2]。</li>
-<li>思考上述两种控制器设计的译码方式，给出代码示例，并尝试对比各方式的优劣。<div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="comment">//指令对应的控制信号如何取值</span></span><br><span class="line"><span class="keyword">always</span> @(*) </span><br><span class="line">    <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">if</span> (add) <span class="keyword">begin</span></span><br><span class="line">            RegDst = <span class="number">1</span>;</span><br><span class="line">            RegWrite = <span class="number">1</span>;</span><br><span class="line">            ALUCtrl = <span class="number">3&#x27;b010</span>;</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (sub) <span class="keyword">begin</span></span><br><span class="line">            <span class="comment">//......</span></span><br><span class="line">        <span class="keyword">end</span>   </span><br><span class="line">        <span class="comment">//......   </span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line"><span class="comment">//控制信号所对应的指令</span></span><br><span class="line"><span class="keyword">assign</span> Jump = jal | jr;</span><br><span class="line"><span class="keyword">assign</span> RegDst = add | sub;</span><br><span class="line"><span class="comment">//......</span></span><br></pre></td></tr></table></figure></div>
-第一种译码方式方便清楚每一个指令对应的控制信号，但书写代码量较大。第二种译码方式代码书写量较小，但需要注意的是，增加新的指令时，各种控制信号的增改勿重勿漏。</li>
-<li>在相应的部件中，复位信号的设计都是同步复位，这与 P3 中的设计要求不同。请对比同步复位与异步复位这两种方式的 reset 信号与 clk 信号优先级的关系。<br>答：同步复位clk信号优先级更高，异步复位reset信号优先级更高。</li>
-</ol>
-<h1 id="祝P4上机一切顺利！"><a href="#祝P4上机一切顺利！" class="headerlink" title="祝P4上机一切顺利！"></a>祝P4上机一切顺利！</h1><h1 id="P4-review"><a href="#P4-review" class="headerlink" title="P4_review"></a>P4_review</h1><h2 id="写在前面：Verilog就是很容易出小问题"><a href="#写在前面：Verilog就是很容易出小问题" class="headerlink" title="写在前面：Verilog就是很容易出小问题"></a>写在前面：Verilog就是很容易出小问题</h2><ol>
-<li>是否有符号数，注意<code>$signed</code></li>
-<li>多加括号，勤加括号</li>
-<li>判断条件写成<code>temp32 != temp32</code>,我是笨蛋</li>
-<li>不要慌乱，把子模块的信号什么都加好</li>
-<li>祝流水线顺利！</li>
-</ol>
-]]></content>
       <categories>
         <category>BUAA_CO</category>
       </categories>
@@ -4593,6 +4593,94 @@
       </tags>
   </entry>
   <entry>
+    <title>Pre</title>
+    <url>/2023/01/02/Pre/</url>
+    <content><![CDATA[<h1 id="Pre梳理"><a href="#Pre梳理" class="headerlink" title="Pre梳理"></a>Pre梳理</h1><h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="原码、反码、补码"><a href="#原码、反码、补码" class="headerlink" title="原码、反码、补码"></a>原码、反码、补码</h3><p>正数 ：原码 &#x3D; 反码 &#x3D; 补码</p>
+<p>负数 ：原码 ：符号位为1，其后为绝对值的原码<br>反码 ：绝对值的原码各位取反<br>补码 ：反码 + 1 （或2^n - x）</p>
+<p>计算机中的整数都用补码储存</p>
+<h3 id="位宽大小"><a href="#位宽大小" class="headerlink" title="位宽大小"></a>位宽大小</h3><ol>
+<li>1Byte &#x3D; 8bit</li>
+<li>1字 &#x3D; 4Byte（32位机）</li>
+<li>在写MIPS程序时，一个寄存器是32位，4字节，MIPS中的offset偏移操作都是以字节为单位的</li>
+</ol>
+<h2 id="Logisim"><a href="#Logisim" class="headerlink" title="Logisim"></a>Logisim</h2><ol>
+<li>模块化设计的思想</li>
+<li>注意外观以及题目所给要求</li>
+<li>优雅的赋初值操作：<br>counter的输出端为initial，把counter设置为stay at max value，然后设置max value （maybe是1），再把initial标签与mux相接就可以啦  </li>
+<li>理解电路的“同步”，这与我们平常写高级语言代码的设计是不同的</li>
+<li>注意时钟周期要求，学会使用寄存器而不是直接进行输出</li>
+</ol>
+<h2 id="Verilog"><a href="#Verilog" class="headerlink" title="Verilog"></a>Verilog</h2><h3 id="阻塞赋值与非阻塞赋值"><a href="#阻塞赋值与非阻塞赋值" class="headerlink" title="阻塞赋值与非阻塞赋值"></a>阻塞赋值与非阻塞赋值</h3><ol>
+<li>时序逻辑，非阻塞赋值（&lt;&#x3D;）；组合逻辑，阻塞赋值（&#x3D;）</li>
+<li>组合逻辑和时序逻辑的always块分开</li>
+<li>不要出现对同一个变量在多个always块中赋值，也不要出现一个变量既用阻塞赋值又用非阻塞赋值</li>
+<li>判断输出时，可以把输出部分写在always块中，也可以写在always块外使用assign语句，assign相当于是组合逻辑中的一根线，输出会随着输入而发生变化<br>for example<div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line">   <span class="keyword">always</span> @(<span class="keyword">posedge</span> clk, <span class="keyword">posedge</span> rst) <span class="comment">//异步复位</span></span><br><span class="line">   <span class="keyword">begin</span></span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">   <span class="keyword">end</span></span><br><span class="line">   <span class="keyword">assign</span> ans = () ? <span class="number">1&#x27;b1</span> : <span class="number">1&#x27;b0</span>;</span><br><span class="line"><span class="comment">// another</span></span><br><span class="line">   <span class="keyword">always</span> @(<span class="keyword">posedge</span> clk,<span class="keyword">posedge</span> rst)</span><br><span class="line">   <span class="keyword">begin</span></span><br><span class="line">   <span class="comment">//</span></span><br><span class="line">   ans = () ? <span class="number">1&#x27;b1</span> : <span class="number">1&#x27;b0</span>;</span><br><span class="line">   <span class="keyword">end</span></span><br></pre></td></tr></table></figure></div></li>
+</ol>
+<h3 id="状态机"><a href="#状态机" class="headerlink" title="状态机"></a>状态机</h3><ol>
+<li>Moore与Meely的选择<br>不用在最初设计电路时过多区分<br>Moore机可以满足输出一个cycle的要求<br>Meely机可以满足最早输出（越快越好的要求）<br>（详见L4 P25 波形示意图）<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/Pre/1.png"
+                      alt="1"
+                ></li>
+<li>关键是次态逻辑与输出逻辑的设计<br>设计次态逻辑时，先想清楚你需要哪些状态，然后对这些状态进行编码，然后设计好状态转移图，根据图去编写代码<br>设计输出逻辑时，就要想清楚是Moore还是Meely，也就是说我的输入与当前输出是否有关</li>
+</ol>
+<h3 id="符号数处理"><a href="#符号数处理" class="headerlink" title="符号数处理"></a>符号数处理</h3><p>最保险的处理有符号数a:  </p>
+<div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="built_in">$signed</span>(<span class="built_in">$signed</span>(a)&lt;&lt;b)</span><br></pre></td></tr></table></figure></div>
+<h3 id="异步复位处理"><a href="#异步复位处理" class="headerlink" title="异步复位处理"></a>异步复位处理</h3><div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk,<span class="keyword">posedge</span> rst)</span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">     <span class="keyword">if</span> (rst) state &lt;= `S0;</span><br><span class="line">     <span class="keyword">else</span></span><br><span class="line">         <span class="keyword">case</span>(state)</span><br><span class="line">         <span class="comment">//</span></span><br><span class="line">         <span class="keyword">default</span>: ;<span class="comment">//避免状态机跑飞了</span></span><br><span class="line">         <span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></div>
+<h3 id="初始化操作"><a href="#初始化操作" class="headerlink" title="初始化操作"></a>初始化操作</h3><div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="keyword">initial</span>  </span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">     state &lt;= `S0;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></div>
+<h3 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h3><ol>
+<li>注意不要忘记begin后的end，case后的default和endcase，以及最后的endmodule</li>
+<li>模块端口定义的最后一行不要加’,’  <div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="keyword">module</span> counting(</span><br><span class="line"> <span class="keyword">input</span> [<span class="number">1</span>:<span class="number">0</span>] num,</span><br><span class="line"> <span class="keyword">input</span> clk,</span><br><span class="line"> <span class="keyword">input</span> ans <span class="comment">//不加&#x27;,&#x27;</span></span><br><span class="line">)；<span class="comment">//&#x27;；&#x27;不要忘记</span></span><br></pre></td></tr></table></figure></div></li>
+</ol>
+<h3 id="例题标程"><a href="#例题标程" class="headerlink" title="例题标程"></a>例题标程</h3><div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="meta">`<span class="keyword">define</span> S0 2&#x27;b00</span></span><br><span class="line"><span class="meta">`<span class="keyword">define</span> S1 2&#x27;b01</span></span><br><span class="line"><span class="meta">`<span class="keyword">define</span> S2 2&#x27;b10</span></span><br><span class="line"><span class="meta">`<span class="keyword">define</span> S3 2&#x27;b11</span></span><br><span class="line"><span class="keyword">module</span> counting(</span><br><span class="line">    <span class="keyword">input</span> [<span class="number">1</span>:<span class="number">0</span>] num,</span><br><span class="line">    <span class="keyword">input</span> clk,</span><br><span class="line">    <span class="keyword">input</span> ans</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line"><span class="keyword">reg</span> [<span class="number">1</span>:<span class="number">0</span>] status;</span><br><span class="line"></span><br><span class="line"><span class="keyword">initial</span></span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">    status &lt;= `S0;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">always</span>@(<span class="keyword">posedge</span> clk)</span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">case</span>(status)</span><br><span class="line">        `S0: <span class="keyword">begin</span></span><br><span class="line">                <span class="keyword">if</span> (num == <span class="number">2&#x27;b01</span>)</span><br><span class="line">                <span class="keyword">begin</span></span><br><span class="line">                    status &lt;= `S1;</span><br><span class="line">                <span class="keyword">end</span></span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (num == <span class="number">2&#x27;b10</span>)</span><br><span class="line">                <span class="keyword">begin</span></span><br><span class="line">                    status &lt;= `S0;</span><br><span class="line">                <span class="keyword">end</span></span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (num == <span class="number">2&#x27;b11</span>)</span><br><span class="line">                <span class="keyword">begin</span></span><br><span class="line">                    status &lt;= `S0;</span><br><span class="line">                <span class="keyword">end</span></span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">begin</span></span><br><span class="line">                    status &lt;= `S0; <span class="comment">// 对于一切非正常输出，回到状态0</span></span><br><span class="line">                <span class="keyword">end</span></span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">        <span class="keyword">default</span>: status &lt;= `S0;</span><br><span class="line">    <span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">assign</span> ans = (status == `S3) ? <span class="number">1&#x27;b1</span> : <span class="number">1&#x27;b0</span>;</span><br><span class="line"><span class="keyword">endmodule</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
+
+<h2 id="MIPS"><a href="#MIPS" class="headerlink" title="MIPS"></a>MIPS</h2><h3 id="伪指令"><a href="#伪指令" class="headerlink" title="伪指令"></a>伪指令</h3><div class="highlight-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="code"><pre><span class="line"><span class="meta">.data</span></span><br><span class="line"><span class="comment">#.asciiz是字对齐的,可以放在前面，然后在后面申请空间(.space)</span></span><br><span class="line"><span class="meta">.text</span></span><br><span class="line"><span class="comment">#code</span></span><br><span class="line"><span class="meta">.word</span></span><br><span class="line"><span class="comment">#以字节存储</span></span><br></pre></td></tr></table></figure></div>
+<h3 id="syscall"><a href="#syscall" class="headerlink" title="syscall"></a>syscall</h3><div class="highlight-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="code"><pre><span class="line"><span class="comment">#字符串输出</span></span><br><span class="line">la $<span class="built_in">a0</span>,<span class="keyword">addr </span><span class="comment"># $a0：addr of the str；$a1: max size of the str；the end &#x27;\0&#x27;</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">4</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="comment">#整数输出</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">1</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span><span class="comment">#输出$a0寄存器中的值</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#读入一个整数</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">5</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">move </span>$<span class="built_in">s0</span>,$<span class="built_in">v0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#读入一个字符串</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">8</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span><span class="comment"># $a0 :the addr; $a1: the maxsize</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#读入一个字符</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">12</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span><span class="comment"># $v0 cotains it</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#结束程序</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">10</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span></span><br></pre></td></tr></table></figure></div>
+<h1 id="上机总结"><a href="#上机总结" class="headerlink" title="上机总结"></a>上机总结</h1><h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>此次pre考的比较基础，只过了Verilog，感觉对于基础知识模型要加强学习</p>
+<h2 id="Mealy机"><a href="#Mealy机" class="headerlink" title="Mealy机"></a>Mealy机</h2><p>此次Logisim和Verilog都考察的是Mealy型状态机  </p>
+<h3 id="Mealy机的基本电路设计"><a href="#Mealy机的基本电路设计" class="headerlink" title="Mealy机的基本电路设计"></a>Mealy机的基本电路设计</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/Pre/2.jpg"
+                      alt="1"
+                ></p>
+<h3 id="失误地方"><a href="#失误地方" class="headerlink" title="失误地方"></a>失误地方</h3><ol>
+<li>题意不清，应该是对于每个输入都会判断与之前输入之和是否大于等于5</li>
+<li>寄存器的使用,请注意en端口与clk端口<br><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/Pre/register.jpg"
+                      alt="1"
+                ></li>
+</ol>
+<h3 id="助教学长的标程"><a href="#助教学长的标程" class="headerlink" title="助教学长的标程"></a>助教学长的标程</h3><p><img  
+                     lazyload
+                     src="/images/loading.svg"
+                     data-src="/Pre/3.jpg"
+                      alt="1"
+                ><br>有疑问：  </p>
+<ol>
+<li>没有实现大于零时清空寄存器<br>分析：使用mux实现的，如果all大于等于5，mux的选择端为1，mux输出为0，那么下一个时钟上升沿到来之时，register存入0，实现寄存器清零</li>
+<li>为什么这是Mealy机呀，感觉输出状态是由输入状态唯一决定的<br>分析：每一个时钟上升沿到来，寄存器存入当前多路选择器的输出值，与in相加并判断是否大于等于5（Mealy）</li>
+</ol>
+<h2 id="Verilog-1"><a href="#Verilog-1" class="headerlink" title="Verilog"></a>Verilog</h2><p>考了异步复位以及状态转移</p>
+<div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="keyword">assign</span> out = ((status == `S2)&amp;(in == <span class="number">1</span>)) ? <span class="number">1&#x27;b1</span> : <span class="number">1&#x27;b0</span>; <span class="comment">//题目要求是Mealy机</span></span><br><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk,<span class="keyword">posedge</span> reset) <span class="comment">//异步复位</span></span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">if</span> (reset)</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">case</span>(status)<span class="comment">//注意这里不要有冒号</span></span><br><span class="line">        `S0:</span><br><span class="line">        <span class="comment">//不要打成中文的标点，很容易就CTRL切换中英了</span></span><br><span class="line">        <span class="keyword">default</span>：；</span><br><span class="line">        <span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></div>
+
+<h2 id="MIPS-1"><a href="#MIPS-1" class="headerlink" title="MIPS"></a>MIPS</h2><p>此次MIPS考察了求平方根，没有时间了就正向遍历，t了一个点，据大家讨论，反向遍历可以全过，正确做法是二分查找或者移位，主要考察对于循环的使用</p>
+<h2 id="碎碎念"><a href="#碎碎念" class="headerlink" title="碎碎念"></a>碎碎念</h2><ol>
+<li>掌握基础知识，比如verilog部分就是因为重点复习了状态机和异步复位等，在之前就把问题解决了（当然考到了这些问题），总之，多思考，多求教，多练习，帆帆加油！</li>
+<li>对于机房环境，电脑容易卡掉线，不要慌多刷新几次；比较昏暗，注意键盘吧；不要被旁边同学影响了，专注自己，细心耐心静心，加油吧！</li>
+</ol>
+]]></content>
+      <categories>
+        <category>BUAA_CO</category>
+      </categories>
+      <tags>
+        <tag>BUAA_CO</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>P7</title>
     <url>/2023/01/02/P7/</url>
     <content><![CDATA[<h1 id="P7-Study"><a href="#P7-Study" class="headerlink" title="P7_Study"></a>P7_Study</h1><h2 id="设计概述"><a href="#设计概述" class="headerlink" title="设计概述"></a>设计概述</h2><p>本文设计的是又Verilog实现的MIPS微系统，该微系统支持33条汇编指令，为实现该功能，笔者设计PC，CMP，GRF，EXT，NPC，ALU，MD，Load，Store，CP0，D_Reg,E_Reg,M_Reg,W_Reg,MCU,HCU,Bridge,TC模块。<br>顶层结构如下：<br><img  
@@ -5145,94 +5233,6 @@ EPC的确定以及对于Req的操作<div class="highlight-container" data-rel="V
 <li>interrupt测试<br>枚举各种情况下的中断，写一个支持中断的tb</li>
 </ul>
 <h1 id="祝上机顺利！"><a href="#祝上机顺利！" class="headerlink" title="祝上机顺利！"></a>祝上机顺利！</h1>]]></content>
-      <categories>
-        <category>BUAA_CO</category>
-      </categories>
-      <tags>
-        <tag>BUAA_CO</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Pre</title>
-    <url>/2023/01/02/Pre/</url>
-    <content><![CDATA[<h1 id="Pre梳理"><a href="#Pre梳理" class="headerlink" title="Pre梳理"></a>Pre梳理</h1><h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="原码、反码、补码"><a href="#原码、反码、补码" class="headerlink" title="原码、反码、补码"></a>原码、反码、补码</h3><p>正数 ：原码 &#x3D; 反码 &#x3D; 补码</p>
-<p>负数 ：原码 ：符号位为1，其后为绝对值的原码<br>反码 ：绝对值的原码各位取反<br>补码 ：反码 + 1 （或2^n - x）</p>
-<p>计算机中的整数都用补码储存</p>
-<h3 id="位宽大小"><a href="#位宽大小" class="headerlink" title="位宽大小"></a>位宽大小</h3><ol>
-<li>1Byte &#x3D; 8bit</li>
-<li>1字 &#x3D; 4Byte（32位机）</li>
-<li>在写MIPS程序时，一个寄存器是32位，4字节，MIPS中的offset偏移操作都是以字节为单位的</li>
-</ol>
-<h2 id="Logisim"><a href="#Logisim" class="headerlink" title="Logisim"></a>Logisim</h2><ol>
-<li>模块化设计的思想</li>
-<li>注意外观以及题目所给要求</li>
-<li>优雅的赋初值操作：<br>counter的输出端为initial，把counter设置为stay at max value，然后设置max value （maybe是1），再把initial标签与mux相接就可以啦  </li>
-<li>理解电路的“同步”，这与我们平常写高级语言代码的设计是不同的</li>
-<li>注意时钟周期要求，学会使用寄存器而不是直接进行输出</li>
-</ol>
-<h2 id="Verilog"><a href="#Verilog" class="headerlink" title="Verilog"></a>Verilog</h2><h3 id="阻塞赋值与非阻塞赋值"><a href="#阻塞赋值与非阻塞赋值" class="headerlink" title="阻塞赋值与非阻塞赋值"></a>阻塞赋值与非阻塞赋值</h3><ol>
-<li>时序逻辑，非阻塞赋值（&lt;&#x3D;）；组合逻辑，阻塞赋值（&#x3D;）</li>
-<li>组合逻辑和时序逻辑的always块分开</li>
-<li>不要出现对同一个变量在多个always块中赋值，也不要出现一个变量既用阻塞赋值又用非阻塞赋值</li>
-<li>判断输出时，可以把输出部分写在always块中，也可以写在always块外使用assign语句，assign相当于是组合逻辑中的一根线，输出会随着输入而发生变化<br>for example<div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line">   <span class="keyword">always</span> @(<span class="keyword">posedge</span> clk, <span class="keyword">posedge</span> rst) <span class="comment">//异步复位</span></span><br><span class="line">   <span class="keyword">begin</span></span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">   <span class="keyword">end</span></span><br><span class="line">   <span class="keyword">assign</span> ans = () ? <span class="number">1&#x27;b1</span> : <span class="number">1&#x27;b0</span>;</span><br><span class="line"><span class="comment">// another</span></span><br><span class="line">   <span class="keyword">always</span> @(<span class="keyword">posedge</span> clk,<span class="keyword">posedge</span> rst)</span><br><span class="line">   <span class="keyword">begin</span></span><br><span class="line">   <span class="comment">//</span></span><br><span class="line">   ans = () ? <span class="number">1&#x27;b1</span> : <span class="number">1&#x27;b0</span>;</span><br><span class="line">   <span class="keyword">end</span></span><br></pre></td></tr></table></figure></div></li>
-</ol>
-<h3 id="状态机"><a href="#状态机" class="headerlink" title="状态机"></a>状态机</h3><ol>
-<li>Moore与Meely的选择<br>不用在最初设计电路时过多区分<br>Moore机可以满足输出一个cycle的要求<br>Meely机可以满足最早输出（越快越好的要求）<br>（详见L4 P25 波形示意图）<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/Pre/1.png"
-                      alt="1"
-                ></li>
-<li>关键是次态逻辑与输出逻辑的设计<br>设计次态逻辑时，先想清楚你需要哪些状态，然后对这些状态进行编码，然后设计好状态转移图，根据图去编写代码<br>设计输出逻辑时，就要想清楚是Moore还是Meely，也就是说我的输入与当前输出是否有关</li>
-</ol>
-<h3 id="符号数处理"><a href="#符号数处理" class="headerlink" title="符号数处理"></a>符号数处理</h3><p>最保险的处理有符号数a:  </p>
-<div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="built_in">$signed</span>(<span class="built_in">$signed</span>(a)&lt;&lt;b)</span><br></pre></td></tr></table></figure></div>
-<h3 id="异步复位处理"><a href="#异步复位处理" class="headerlink" title="异步复位处理"></a>异步复位处理</h3><div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk,<span class="keyword">posedge</span> rst)</span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">     <span class="keyword">if</span> (rst) state &lt;= `S0;</span><br><span class="line">     <span class="keyword">else</span></span><br><span class="line">         <span class="keyword">case</span>(state)</span><br><span class="line">         <span class="comment">//</span></span><br><span class="line">         <span class="keyword">default</span>: ;<span class="comment">//避免状态机跑飞了</span></span><br><span class="line">         <span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></div>
-<h3 id="初始化操作"><a href="#初始化操作" class="headerlink" title="初始化操作"></a>初始化操作</h3><div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="keyword">initial</span>  </span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">     state &lt;= `S0;</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></div>
-<h3 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h3><ol>
-<li>注意不要忘记begin后的end，case后的default和endcase，以及最后的endmodule</li>
-<li>模块端口定义的最后一行不要加’,’  <div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="keyword">module</span> counting(</span><br><span class="line"> <span class="keyword">input</span> [<span class="number">1</span>:<span class="number">0</span>] num,</span><br><span class="line"> <span class="keyword">input</span> clk,</span><br><span class="line"> <span class="keyword">input</span> ans <span class="comment">//不加&#x27;,&#x27;</span></span><br><span class="line">)；<span class="comment">//&#x27;；&#x27;不要忘记</span></span><br></pre></td></tr></table></figure></div></li>
-</ol>
-<h3 id="例题标程"><a href="#例题标程" class="headerlink" title="例题标程"></a>例题标程</h3><div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="meta">`<span class="keyword">define</span> S0 2&#x27;b00</span></span><br><span class="line"><span class="meta">`<span class="keyword">define</span> S1 2&#x27;b01</span></span><br><span class="line"><span class="meta">`<span class="keyword">define</span> S2 2&#x27;b10</span></span><br><span class="line"><span class="meta">`<span class="keyword">define</span> S3 2&#x27;b11</span></span><br><span class="line"><span class="keyword">module</span> counting(</span><br><span class="line">    <span class="keyword">input</span> [<span class="number">1</span>:<span class="number">0</span>] num,</span><br><span class="line">    <span class="keyword">input</span> clk,</span><br><span class="line">    <span class="keyword">input</span> ans</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line"><span class="keyword">reg</span> [<span class="number">1</span>:<span class="number">0</span>] status;</span><br><span class="line"></span><br><span class="line"><span class="keyword">initial</span></span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">    status &lt;= `S0;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">always</span>@(<span class="keyword">posedge</span> clk)</span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">case</span>(status)</span><br><span class="line">        `S0: <span class="keyword">begin</span></span><br><span class="line">                <span class="keyword">if</span> (num == <span class="number">2&#x27;b01</span>)</span><br><span class="line">                <span class="keyword">begin</span></span><br><span class="line">                    status &lt;= `S1;</span><br><span class="line">                <span class="keyword">end</span></span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (num == <span class="number">2&#x27;b10</span>)</span><br><span class="line">                <span class="keyword">begin</span></span><br><span class="line">                    status &lt;= `S0;</span><br><span class="line">                <span class="keyword">end</span></span><br><span class="line">                <span class="keyword">else</span> <span class="keyword">if</span> (num == <span class="number">2&#x27;b11</span>)</span><br><span class="line">                <span class="keyword">begin</span></span><br><span class="line">                    status &lt;= `S0;</span><br><span class="line">                <span class="keyword">end</span></span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                <span class="keyword">begin</span></span><br><span class="line">                    status &lt;= `S0; <span class="comment">// 对于一切非正常输出，回到状态0</span></span><br><span class="line">                <span class="keyword">end</span></span><br><span class="line">            <span class="keyword">end</span></span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">        <span class="keyword">default</span>: status &lt;= `S0;</span><br><span class="line">    <span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">assign</span> ans = (status == `S3) ? <span class="number">1&#x27;b1</span> : <span class="number">1&#x27;b0</span>;</span><br><span class="line"><span class="keyword">endmodule</span></span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-
-<h2 id="MIPS"><a href="#MIPS" class="headerlink" title="MIPS"></a>MIPS</h2><h3 id="伪指令"><a href="#伪指令" class="headerlink" title="伪指令"></a>伪指令</h3><div class="highlight-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="code"><pre><span class="line"><span class="meta">.data</span></span><br><span class="line"><span class="comment">#.asciiz是字对齐的,可以放在前面，然后在后面申请空间(.space)</span></span><br><span class="line"><span class="meta">.text</span></span><br><span class="line"><span class="comment">#code</span></span><br><span class="line"><span class="meta">.word</span></span><br><span class="line"><span class="comment">#以字节存储</span></span><br></pre></td></tr></table></figure></div>
-<h3 id="syscall"><a href="#syscall" class="headerlink" title="syscall"></a>syscall</h3><div class="highlight-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="code"><pre><span class="line"><span class="comment">#字符串输出</span></span><br><span class="line">la $<span class="built_in">a0</span>,<span class="keyword">addr </span><span class="comment"># $a0：addr of the str；$a1: max size of the str；the end &#x27;\0&#x27;</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">4</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="comment">#整数输出</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">1</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span><span class="comment">#输出$a0寄存器中的值</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#读入一个整数</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">5</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">move </span>$<span class="built_in">s0</span>,$<span class="built_in">v0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#读入一个字符串</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">8</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span><span class="comment"># $a0 :the addr; $a1: the maxsize</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#读入一个字符</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">12</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span><span class="comment"># $v0 cotains it</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#结束程序</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">10</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span></span><br></pre></td></tr></table></figure></div>
-<h1 id="上机总结"><a href="#上机总结" class="headerlink" title="上机总结"></a>上机总结</h1><h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>此次pre考的比较基础，只过了Verilog，感觉对于基础知识模型要加强学习</p>
-<h2 id="Mealy机"><a href="#Mealy机" class="headerlink" title="Mealy机"></a>Mealy机</h2><p>此次Logisim和Verilog都考察的是Mealy型状态机  </p>
-<h3 id="Mealy机的基本电路设计"><a href="#Mealy机的基本电路设计" class="headerlink" title="Mealy机的基本电路设计"></a>Mealy机的基本电路设计</h3><p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/Pre/2.jpg"
-                      alt="1"
-                ></p>
-<h3 id="失误地方"><a href="#失误地方" class="headerlink" title="失误地方"></a>失误地方</h3><ol>
-<li>题意不清，应该是对于每个输入都会判断与之前输入之和是否大于等于5</li>
-<li>寄存器的使用,请注意en端口与clk端口<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/Pre/register.jpg"
-                      alt="1"
-                ></li>
-</ol>
-<h3 id="助教学长的标程"><a href="#助教学长的标程" class="headerlink" title="助教学长的标程"></a>助教学长的标程</h3><p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/Pre/3.jpg"
-                      alt="1"
-                ><br>有疑问：  </p>
-<ol>
-<li>没有实现大于零时清空寄存器<br>分析：使用mux实现的，如果all大于等于5，mux的选择端为1，mux输出为0，那么下一个时钟上升沿到来之时，register存入0，实现寄存器清零</li>
-<li>为什么这是Mealy机呀，感觉输出状态是由输入状态唯一决定的<br>分析：每一个时钟上升沿到来，寄存器存入当前多路选择器的输出值，与in相加并判断是否大于等于5（Mealy）</li>
-</ol>
-<h2 id="Verilog-1"><a href="#Verilog-1" class="headerlink" title="Verilog"></a>Verilog</h2><p>考了异步复位以及状态转移</p>
-<div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="keyword">assign</span> out = ((status == `S2)&amp;(in == <span class="number">1</span>)) ? <span class="number">1&#x27;b1</span> : <span class="number">1&#x27;b0</span>; <span class="comment">//题目要求是Mealy机</span></span><br><span class="line"><span class="keyword">always</span> @(<span class="keyword">posedge</span> clk,<span class="keyword">posedge</span> reset) <span class="comment">//异步复位</span></span><br><span class="line"><span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">if</span> (reset)</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">case</span>(status)<span class="comment">//注意这里不要有冒号</span></span><br><span class="line">        `S0:</span><br><span class="line">        <span class="comment">//不要打成中文的标点，很容易就CTRL切换中英了</span></span><br><span class="line">        <span class="keyword">default</span>：；</span><br><span class="line">        <span class="keyword">endcase</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></div>
-
-<h2 id="MIPS-1"><a href="#MIPS-1" class="headerlink" title="MIPS"></a>MIPS</h2><p>此次MIPS考察了求平方根，没有时间了就正向遍历，t了一个点，据大家讨论，反向遍历可以全过，正确做法是二分查找或者移位，主要考察对于循环的使用</p>
-<h2 id="碎碎念"><a href="#碎碎念" class="headerlink" title="碎碎念"></a>碎碎念</h2><ol>
-<li>掌握基础知识，比如verilog部分就是因为重点复习了状态机和异步复位等，在之前就把问题解决了（当然考到了这些问题），总之，多思考，多求教，多练习，帆帆加油！</li>
-<li>对于机房环境，电脑容易卡掉线，不要慌多刷新几次；比较昏暗，注意键盘吧；不要被旁边同学影响了，专注自己，细心耐心静心，加油吧！</li>
-</ol>
-]]></content>
       <categories>
         <category>BUAA_CO</category>
       </categories>
