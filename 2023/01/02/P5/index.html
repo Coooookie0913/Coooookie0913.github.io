@@ -19,7 +19,7 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-    <link rel="shortcut icon" href="/images/logo.svg">
+    <link rel="shortcut icon" href="/images/cookie.png">
     
 <link rel="stylesheet" href="/css/fontawesome.min.css">
 
@@ -41,7 +41,7 @@
     <script id="hexo-configurations">
     let REDEFINE = window.REDEFINE || {};
     REDEFINE.hexo_config = {"hostname":"coooookie0913.github.io","root":"/","language":"en","path":"search.xml"};
-    REDEFINE.theme_config = {"toc":{"enable":true,"number":false,"expand_all":true,"init_open":true},"style":{"primary_color":"#005080","avatar":"/images/avatar.svg","favicon":"/images/logo.svg","article_img_align":"center","right_side_width":"210px","content_max_width":"1000px","nav_color":{"left":"#f78736","right":"#367df7","transparency":35},"hover":{"shadow":true,"scale":false},"first_screen":{"enable":true,"background_image":{"light":"https://evan.beee.top/img/wallhaven-wqery6-light.webp","dark":"https://evan.beee.top/img/wallhaven-wqery6-dark.webp"},"title_color":{"light":"#fff","dark":"#d1d1b6"},"description":"Theme Redefine"},"scroll":{"progress_bar":{"enable":true},"percent":{"enable":false}}},"local_search":{"enable":true,"preload":true},"code_block":{"copy":true,"style":"mac"},"pjax":{"enable":true},"lazyload":{"enable":true},"version":"0.4.5","friend_links":{"columns":2}};
+    REDEFINE.theme_config = {"toc":{"enable":true,"number":false,"expand_all":true,"init_open":true},"style":{"primary_color":"#005080","avatar":"/images/cookie.png","favicon":"/images/cookie.png","article_img_align":"center","right_side_width":"210px","content_max_width":"1000px","nav_color":{"left":"#f78736","right":"#367df7","transparency":35},"hover":{"shadow":true,"scale":false},"first_screen":{"enable":true,"background_image":{"light":"https://evan.beee.top/img/wallhaven-wqery6-light.webp","dark":"https://evan.beee.top/img/wallhaven-wqery6-dark.webp"},"title_color":{"light":"#fff","dark":"#d1d1b6"},"description":"Coooookie's Blog"},"scroll":{"progress_bar":{"enable":true},"percent":{"enable":false}}},"local_search":{"enable":true,"preload":true},"code_block":{"copy":true,"style":"mac"},"pjax":{"enable":true},"lazyload":{"enable":false},"version":"0.4.5","friend_links":{"columns":3}};
     REDEFINE.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
   </script>
 <meta name="generator" content="Hexo 6.3.0"></head>
@@ -153,6 +153,19 @@
                             
                         </li>
                     
+                        <li class="menu-item">
+                            <!-- Menu -->
+                            <a class="" 
+                                href="/links" >
+                                
+                                    
+                                    LINKS
+                                
+                            </a>
+                            <!-- Submenu -->
+                            
+                        </li>
+                    
                     
                         <li class="menu-item search search-popup-trigger">
                             <i class="fa-solid fa-magnifying-glass"></i>
@@ -240,6 +253,18 @@
                 <!-- Submenu -->
                 
             
+                <li class="drawer-menu-item flex-center">
+                    <a class="" 
+                       href="/links" >
+                         
+                            
+                            LINKS
+                        
+                    </a>
+                </li>
+                <!-- Submenu -->
+                
+            
         </ul>
     </div>
 
@@ -265,7 +290,7 @@
             
                 <div class="article-header">
                     <div class="avatar">
-                        <img src="/images/avatar.svg">
+                        <img src="/images/cookie.png">
                     </div>
                     <div class="info">
                         <div class="author">
@@ -322,17 +347,7 @@
             
 
             <div class="article-content markdown-body">
-                <h1 id="1-P5-流水线CPU设计方案"><a href="#1-P5-流水线CPU设计方案" class="headerlink" title="1 P5 流水线CPU设计方案"></a>1 P5 流水线CPU设计方案</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所设计的为Verilog实现的流水线MIPS架构CPU，该CPU支持10条指令，为此，笔者设计了PC,IM,D_Reg,D_MCU,CMP,GRF,EXT,NPC,E_Reg,E_MCU,ALU,M_Reg,M_MCU,DM,W_Reg,W_MCU模块。整体搭建采用自下而上的方式完成，该CPU的译码方式是分布式译码。<br>顶层模块设计图如下<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P5/%E8%AE%BE%E8%AE%A1%E5%9B%BE.png"
-                      alt="1"
-                ><br>信号控制如下<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P5/%E4%BF%A1%E5%8F%B7.png"
-                      alt="1"
-                ></p>
+                <h1 id="1-P5-流水线CPU设计方案"><a href="#1-P5-流水线CPU设计方案" class="headerlink" title="1 P5 流水线CPU设计方案"></a>1 P5 流水线CPU设计方案</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所设计的为Verilog实现的流水线MIPS架构CPU，该CPU支持10条指令，为此，笔者设计了PC,IM,D_Reg,D_MCU,CMP,GRF,EXT,NPC,E_Reg,E_MCU,ALU,M_Reg,M_MCU,DM,W_Reg,W_MCU模块。整体搭建采用自下而上的方式完成，该CPU的译码方式是分布式译码。<br>顶层模块设计图如下<br><img src="/P5/%E8%AE%BE%E8%AE%A1%E5%9B%BE.png" alt="1"><br>信号控制如下<br><img src="/P5/%E4%BF%A1%E5%8F%B7.png" alt="1"></p>
 <h2 id="1-2-实现指令说明"><a href="#1-2-实现指令说明" class="headerlink" title="1.2 实现指令说明"></a>1.2 实现指令说明</h2><ul>
 <li>cal_R : add,sub</li>
 <li>cal_I :ori,lui(这里lui视为将立即数extend后的加法指令)</li>
@@ -1692,18 +1707,8 @@
 <h1 id="祝P5上机一切顺利！"><a href="#祝P5上机一切顺利！" class="headerlink" title="祝P5上机一切顺利！"></a>祝P5上机一切顺利！</h1><h1 id="11-x2F-15-P5第一次上机"><a href="#11-x2F-15-P5第一次上机" class="headerlink" title="11&#x2F;15 P5第一次上机"></a>11&#x2F;15 P5第一次上机</h1><p>失败了失败了失败了<br>失败是成功之母，下周一定能过！<br>总的来说还是和往年题一样，条件存储 + 链接条件跳转 +  计算，注意题目顺序吧</p>
 <ol>
 <li>条件存储但是题目记不清楚了qaq，最难的放第一个了</li>
-<li>原题，题目如下<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P5/P5T2.png"
-                      alt="1"
-                ><br>跟同学交流还是在判断D级当前指令是bonall且符合条件，那么就把F_instr 变成nop<br>maybe课下有bug或者哪里连错了？<br>这次上机好慌乱，顶层模块有一个注释直接把下一句话干没了。还有不要急着提交，应该每个信号都连好，自己把数据通路走一遍看有没有问题。有一些信号没连上的错误然后一直提交评测也好搞心态。<br>啊啊啊啊啊，判断相反数也写错了，应该是<code>（r1 + r2 == 32&#39;d0）&amp;&amp; (!((r1 == 32&#39;h8000_0000)&amp;&amp;(r2 == 32&#39;h8000_0000)))</code>不能同时为<code>32&#39;h8000_0000</code>写成都不能为<code>32&#39;h8000_0000</code>,错的好离谱</li>
-<li>addoi<br>一个算术指令GPR[base] + imm，然后取反得temp，输出temp原码（还是补码，忘记了qaq）<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P5/%E5%8E%9F%E7%A0%81%E5%8F%8D%E7%A0%81%E8%A1%A5%E7%A0%81.jpg"
-                      alt="1"
-                ><br><strong>取反是取相反数不是按位取反啊啊啊啊啊</strong><br>黑底的设计稿图片课上看的很难受，而且信号也不明显<br>要自己写简单的testbench，测了再交。不要着急提交。<br>我今天晚上在干什么呀</li>
+<li>原题，题目如下<br><img src="/P5/P5T2.png" alt="1"><br>跟同学交流还是在判断D级当前指令是bonall且符合条件，那么就把F_instr 变成nop<br>maybe课下有bug或者哪里连错了？<br>这次上机好慌乱，顶层模块有一个注释直接把下一句话干没了。还有不要急着提交，应该每个信号都连好，自己把数据通路走一遍看有没有问题。有一些信号没连上的错误然后一直提交评测也好搞心态。<br>啊啊啊啊啊，判断相反数也写错了，应该是<code>（r1 + r2 == 32&#39;d0）&amp;&amp; (!((r1 == 32&#39;h8000_0000)&amp;&amp;(r2 == 32&#39;h8000_0000)))</code>不能同时为<code>32&#39;h8000_0000</code>写成都不能为<code>32&#39;h8000_0000</code>,错的好离谱</li>
+<li>addoi<br>一个算术指令GPR[base] + imm，然后取反得temp，输出temp原码（还是补码，忘记了qaq）<br><img src="/P5/%E5%8E%9F%E7%A0%81%E5%8F%8D%E7%A0%81%E8%A1%A5%E7%A0%81.jpg" alt="1"><br><strong>取反是取相反数不是按位取反啊啊啊啊啊</strong><br>黑底的设计稿图片课上看的很难受，而且信号也不明显<br>要自己写简单的testbench，测了再交。不要着急提交。<br>我今天晚上在干什么呀</li>
 </ol>
 <h1 id="11-x2F-22-P5第二次上机"><a href="#11-x2F-22-P5第二次上机" class="headerlink" title="11&#x2F;22 P5第二次上机"></a>11&#x2F;22 P5第二次上机</h1><p>实在惊险，20：58提交通过</p>
 <ol>
@@ -1989,10 +1994,6 @@
 <script src="/js/code-copy.js"></script>
 
 
-
-
-    
-<script src="/js/lazyload.js"></script>
 
 
 

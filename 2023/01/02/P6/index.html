@@ -19,7 +19,7 @@
     
 <link rel="stylesheet" href="/css/style.css">
 
-    <link rel="shortcut icon" href="/images/logo.svg">
+    <link rel="shortcut icon" href="/images/cookie.png">
     
 <link rel="stylesheet" href="/css/fontawesome.min.css">
 
@@ -41,7 +41,7 @@
     <script id="hexo-configurations">
     let REDEFINE = window.REDEFINE || {};
     REDEFINE.hexo_config = {"hostname":"coooookie0913.github.io","root":"/","language":"en","path":"search.xml"};
-    REDEFINE.theme_config = {"toc":{"enable":true,"number":false,"expand_all":true,"init_open":true},"style":{"primary_color":"#005080","avatar":"/images/avatar.svg","favicon":"/images/logo.svg","article_img_align":"center","right_side_width":"210px","content_max_width":"1000px","nav_color":{"left":"#f78736","right":"#367df7","transparency":35},"hover":{"shadow":true,"scale":false},"first_screen":{"enable":true,"background_image":{"light":"https://evan.beee.top/img/wallhaven-wqery6-light.webp","dark":"https://evan.beee.top/img/wallhaven-wqery6-dark.webp"},"title_color":{"light":"#fff","dark":"#d1d1b6"},"description":"Theme Redefine"},"scroll":{"progress_bar":{"enable":true},"percent":{"enable":false}}},"local_search":{"enable":true,"preload":true},"code_block":{"copy":true,"style":"mac"},"pjax":{"enable":true},"lazyload":{"enable":true},"version":"0.4.5","friend_links":{"columns":2}};
+    REDEFINE.theme_config = {"toc":{"enable":true,"number":false,"expand_all":true,"init_open":true},"style":{"primary_color":"#005080","avatar":"/images/cookie.png","favicon":"/images/cookie.png","article_img_align":"center","right_side_width":"210px","content_max_width":"1000px","nav_color":{"left":"#f78736","right":"#367df7","transparency":35},"hover":{"shadow":true,"scale":false},"first_screen":{"enable":true,"background_image":{"light":"https://evan.beee.top/img/wallhaven-wqery6-light.webp","dark":"https://evan.beee.top/img/wallhaven-wqery6-dark.webp"},"title_color":{"light":"#fff","dark":"#d1d1b6"},"description":"Coooookie's Blog"},"scroll":{"progress_bar":{"enable":true},"percent":{"enable":false}}},"local_search":{"enable":true,"preload":true},"code_block":{"copy":true,"style":"mac"},"pjax":{"enable":true},"lazyload":{"enable":false},"version":"0.4.5","friend_links":{"columns":3}};
     REDEFINE.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
   </script>
 <meta name="generator" content="Hexo 6.3.0"></head>
@@ -153,6 +153,19 @@
                             
                         </li>
                     
+                        <li class="menu-item">
+                            <!-- Menu -->
+                            <a class="" 
+                                href="/links" >
+                                
+                                    
+                                    LINKS
+                                
+                            </a>
+                            <!-- Submenu -->
+                            
+                        </li>
+                    
                     
                         <li class="menu-item search search-popup-trigger">
                             <i class="fa-solid fa-magnifying-glass"></i>
@@ -240,6 +253,18 @@
                 <!-- Submenu -->
                 
             
+                <li class="drawer-menu-item flex-center">
+                    <a class="" 
+                       href="/links" >
+                         
+                            
+                            LINKS
+                        
+                    </a>
+                </li>
+                <!-- Submenu -->
+                
+            
         </ul>
     </div>
 
@@ -265,7 +290,7 @@
             
                 <div class="article-header">
                     <div class="avatar">
-                        <img src="/images/avatar.svg">
+                        <img src="/images/cookie.png">
                     </div>
                     <div class="info">
                         <div class="author">
@@ -322,12 +347,7 @@
             
 
             <div class="article-content markdown-body">
-                <h1 id="1-P5-流水线CPU设计方案"><a href="#1-P5-流水线CPU设计方案" class="headerlink" title="1 P5 流水线CPU设计方案"></a>1 P5 流水线CPU设计方案</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所设计的为Verilog实现的流水线MIPS架构CPU，该CPU支持28条指令，为此，笔者设计了PC，D_Reg, CMP，GRF，EXT，NPC，E_Reg,MDU，ALU，M_Reg,Load,Store,W_Reg,HCU模块，其中IM和DM通过外设实现。整体搭建采用自下而上的方式完成，该CPU的译码方式是分布式译码。<br>顶层模块设计图如下<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P6/%E8%AE%BE%E8%AE%A1%E7%A8%BF(1).jpg"
-                      alt="1"
-                > </p>
+                <h1 id="1-P5-流水线CPU设计方案"><a href="#1-P5-流水线CPU设计方案" class="headerlink" title="1 P5 流水线CPU设计方案"></a>1 P5 流水线CPU设计方案</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所设计的为Verilog实现的流水线MIPS架构CPU，该CPU支持28条指令，为此，笔者设计了PC，D_Reg, CMP，GRF，EXT，NPC，E_Reg,MDU，ALU，M_Reg,Load,Store,W_Reg,HCU模块，其中IM和DM通过外设实现。整体搭建采用自下而上的方式完成，该CPU的译码方式是分布式译码。<br>顶层模块设计图如下<br><img src="/P6/%E8%AE%BE%E8%AE%A1%E7%A8%BF(1).jpg" alt="1"> </p>
 <h2 id="1-2-实现指令说明"><a href="#1-2-实现指令说明" class="headerlink" title="1.2 实现指令说明"></a>1.2 实现指令说明</h2><ul>
 <li>cal_R : add,sub,and,or,slt,sltu,lui</li>
 <li>cal_I : addi,andi,ori</li>
@@ -2085,10 +2105,6 @@
 <script src="/js/code-copy.js"></script>
 
 
-
-
-    
-<script src="/js/lazyload.js"></script>
 
 
 

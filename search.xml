@@ -8,12 +8,7 @@
 <li>功能分析<br>（可以先进行类似于表格的书面化说明，明白好设计思路与设计需求再去设计电路）</li>
 <li>分层设计与分模块设计<br>模块类似于函数的封装，便于理清思路、清晰电路、debug<br>eg1.Moore机与Mealy机都可以划分为状态转移、状态存储、输出模块<br>eg2.32位加法器分为多个一位加法器<br>PS：注意子电路的<strong>appearance</strong>，要跟题目要求一致</li>
 </ol>
-<h2 id="有限状态机"><a href="#有限状态机" class="headerlink" title="有限状态机"></a>有限状态机</h2><p>首先回顾一下Moore和Mealy叭！<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P0/Moore&Mealy.png"
-                      alt="1"
-                ></p>
+<h2 id="有限状态机"><a href="#有限状态机" class="headerlink" title="有限状态机"></a>有限状态机</h2><p>首先回顾一下Moore和Mealy叭！<br><img src="/P0/Moore&Mealy.png" alt="1"></p>
 <ol>
 <li>状态转移电路一般只是<strong>组合逻辑</strong>的计算，也就是说随着input的变化（无论clk处于什么状态），其计算的状态也相应发生，所以一定要有<em>状态存储</em>模块，clk处于上升沿时输出prev_state存入now_state</li>
 <li>对于组合逻辑部分，画好状态转移图，一个经济有效的方法就是<em>打表</em>，利用analyze circuit来实现  </li>
@@ -31,17 +26,7 @@
 <li>三态问题？什么时候用三态？（好像三态的输入用逻辑门运算会变红）<br>不用考虑三态</li>
 <li>二进制减法qaq不会（主要是ftoi那里）<br>扩展为32位，再用0去减<br>用0去减其实与非门等效</li>
 </ol>
-<h2 id="CRC"><a href="#CRC" class="headerlink" title="CRC"></a>CRC</h2><p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P0/CRC%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF.png"
-                      alt="1"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P0/CRC%E8%AE%A1%E7%AE%97%E8%BF%87%E7%A8%8B.png"
-                      alt="1"
-                ></p>
+<h2 id="CRC"><a href="#CRC" class="headerlink" title="CRC"></a>CRC</h2><p><img src="/P0/CRC%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF.png" alt="1"><br><img src="/P0/CRC%E8%AE%A1%E7%AE%97%E8%BF%87%E7%A8%8B.png" alt="1"></p>
 <ol>
 <li>体现了模块化的思想</li>
 <li>要审题，题目说了被除数是要拼接的</li>
@@ -65,62 +50,17 @@
 <h2 id="五人投票"><a href="#五人投票" class="headerlink" title="五人投票"></a>五人投票</h2><ol>
 <li>题意描述：四个组员（00-11）一个组长，组长可以投屏蔽票，并指定一人屏蔽他的投票，组员是赞成、反对、弃权，组长是赞成、反对、弃权、屏蔽，若赞成票数大于反对票数，则输出1，否则输出0</li>
 <li>主要思路：首先用比较器判断每个人是投赞成还是反对（是则对应输出为1，组长投屏蔽票时，则其对应的赞成和反对的输出都为0；组员的统计使用了一个mux，如果是被屏蔽了则把其输入置为弃权票），然后分别把赞成和反对的票数相加，最后用一个比较器绝定输出</li>
-<li>错误：①使用比较器的时候习惯性连亮着的点，连错端口<br>②比较器要置为unsigned（根据数据类型决定比较器的参数属性）<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P0/%E6%AF%94%E8%BE%83%E5%99%A81.jpg"
-                      alt="1"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P0/%E6%AF%94%E8%BE%83%E5%99%A82.jpg"
-                      alt="1"
-                ></li>
-<li>优化：线路过于凌乱复杂，评论区给出了更好的解决方法<br>使用bit adder而非那么多加法器<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P0/bit%20adder.png"
-                      alt="1"
-                ></li>
+<li>错误：①使用比较器的时候习惯性连亮着的点，连错端口<br>②比较器要置为unsigned（根据数据类型决定比较器的参数属性）<br><img src="/P0/%E6%AF%94%E8%BE%83%E5%99%A81.jpg" alt="1"><br><img src="/P0/%E6%AF%94%E8%BE%83%E5%99%A82.jpg" alt="1"></li>
+<li>优化：线路过于凌乱复杂，评论区给出了更好的解决方法<br>使用bit adder而非那么多加法器<br><img src="/P0/bit%20adder.png" alt="1"></li>
 </ol>
 <h2 id="字符匹配"><a href="#字符匹配" class="headerlink" title="字符匹配"></a>字符匹配</h2><ol>
 <li>本题要求一个mealy机来匹配字符串0121（输出01）和1210（输出10），无匹配则输出00</li>
 <li>解题思路：基本的mealy型状态机，即数据输入、状态转移、状态存储、状态输出。其中状态转移和状态输出打表解决。这里需要注意的是有九个状态，状态转移很复杂，一不小心就会出错。</li>
 <li>错误：①注意输入0把之前的输入失配之后，应转移到已匹配一个0的情况而非初始状态<br>②已匹配0121后，再输入0，则匹配到1210；再输入2，转移到匹配了12的状态<br>反正就多注意吧，仔细一点</li>
-<li>优化：利用高老师上课讲的移位的方法，使用三个串联寄存器或者三位的移位寄存器（因为此处只是mealy机），用每一次输入之后input、s0、s1、s2来分别与0121和1210比较<br>三个寄存器串联<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P0/P0L2%E4%B8%89%E4%B8%AA%E5%AF%84%E5%AD%98%E5%99%A81.png"
-                      alt="1"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P0/P0L2%E4%B8%89%E4%B8%AA%E5%AF%84%E5%AD%98%E5%99%A82.png"
-                      alt="1"
-                ><br><strong>注意</strong> 此处需要给寄存器赋一个并不会出现的初值3，否则寄存器默认初始值0，则会使匹配出现问题<br>使用移位寄存器<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P0/%E7%A7%BB%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8.jpg"
-                      alt="1"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P0/P0L2%E7%A7%BB%E4%BD%8D%E5%99%A8%E5%AE%9E%E7%8E%B0.jpg"
-                      alt="1"
-                ><br><strong>注意</strong> 此处也是赋初值问题，为了避免初始默认0造成的影响，同学提供了在最高位加上1校验的方法（00-&gt;100,01-&gt;101 etc）</li>
+<li>优化：利用高老师上课讲的移位的方法，使用三个串联寄存器或者三位的移位寄存器（因为此处只是mealy机），用每一次输入之后input、s0、s1、s2来分别与0121和1210比较<br>三个寄存器串联<br><img src="/P0/P0L2%E4%B8%89%E4%B8%AA%E5%AF%84%E5%AD%98%E5%99%A81.png" alt="1"><br><img src="/P0/P0L2%E4%B8%89%E4%B8%AA%E5%AF%84%E5%AD%98%E5%99%A82.png" alt="1"><br><strong>注意</strong> 此处需要给寄存器赋一个并不会出现的初值3，否则寄存器默认初始值0，则会使匹配出现问题<br>使用移位寄存器<br><img src="/P0/%E7%A7%BB%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8.jpg" alt="1"><br><img src="/P0/P0L2%E7%A7%BB%E4%BD%8D%E5%99%A8%E5%AE%9E%E7%8E%B0.jpg" alt="1"><br><strong>注意</strong> 此处也是赋初值问题，为了避免初始默认0造成的影响，同学提供了在最高位加上1校验的方法（00-&gt;100,01-&gt;101 etc）</li>
 <li>后记：认真听讲，多去思考讨论，学习简洁优美的思路</li>
 </ol>
-<h2 id="类斐波那契"><a href="#类斐波那契" class="headerlink" title="类斐波那契"></a>类斐波那契</h2><p>斐波那契好像是P0绕不过去的点了，就是一年比一年复杂qaq。不应该着急走的，其实慢慢做，静心想，也没有很难！<br>题目：<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P0/P0L3%E9%A2%98%E7%9B%AE.png"
-                      alt="1"
-                ><br>这里提供一个讨论区使用移位寄存器的方法，使用寄存器串联同理<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P0/P0L3%E5%AF%84%E5%AD%98%E5%99%A8%E5%AE%9E%E7%8E%B0.png"
-                      alt="1"
-                ></p>
+<h2 id="类斐波那契"><a href="#类斐波那契" class="headerlink" title="类斐波那契"></a>类斐波那契</h2><p>斐波那契好像是P0绕不过去的点了，就是一年比一年复杂qaq。不应该着急走的，其实慢慢做，静心想，也没有很难！<br>题目：<br><img src="/P0/P0L3%E9%A2%98%E7%9B%AE.png" alt="1"><br>这里提供一个讨论区使用移位寄存器的方法，使用寄存器串联同理<br><img src="/P0/P0L3%E5%AF%84%E5%AD%98%E5%99%A8%E5%AE%9E%E7%8E%B0.png" alt="1"></p>
 <ol>
 <li>计数器在第一个时钟上升沿结束后变成1</li>
 <li>每个时钟上升沿到来都会立即把s_x存入移位寄存器，然后相应后面的s_x又会更新，因为是组合逻辑。在第n个时钟上升沿到来把f(n-1)存入了移位寄存器，此时s_x也改变为f(n),所以第n+1个时钟上升沿到来时，f(n)存入结果寄存器</li>
@@ -156,18 +96,8 @@
 </ol>
 <h3 id="运算"><a href="#运算" class="headerlink" title="运算"></a>运算</h3><ol>
 <li>逻辑右移&gt;&gt;,算数右移&gt;&gt;&gt;,合理适当使用<code>$signed()</code>以及位拼接运算符<code>&#123;&#125;</code></li>
-<li>非阻塞赋值 <code>b &lt;= a</code><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P1/%E9%9D%9E%E9%98%BB%E5%A1%9E%E8%B5%8B%E5%80%BC.jpg"
-                      alt="1"
-                ><br>在编写可综合程序时，这是最常用的方法，always建模时序逻辑一般都使用非阻塞赋值  </li>
-<li>阻塞赋值 <code>b = a</code><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P1/%E9%98%BB%E5%A1%9E%E8%B5%8B%E5%80%BC.jpg"
-                      alt="1"
-                ></li>
+<li>非阻塞赋值 <code>b &lt;= a</code><br><img src="/P1/%E9%9D%9E%E9%98%BB%E5%A1%9E%E8%B5%8B%E5%80%BC.jpg" alt="1"><br>在编写可综合程序时，这是最常用的方法，always建模时序逻辑一般都使用非阻塞赋值  </li>
+<li>阻塞赋值 <code>b = a</code><br><img src="/P1/%E9%98%BB%E5%A1%9E%E8%B5%8B%E5%80%BC.jpg" alt="1"></li>
 </ol>
 <h3 id="条件语句"><a href="#条件语句" class="headerlink" title="条件语句"></a>条件语句</h3><div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line"><span class="keyword">begin</span></span><br><span class="line">    <span class="keyword">if</span> () </span><br><span class="line">        <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        <span class="keyword">begin</span></span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure></div>
 <p>条件语句必须在过程块语句中使用（initial&#x2F;always），并且在条件语句中也要合理使用begin-else，避免不必要的错误</p>
@@ -233,12 +163,7 @@
     <content><![CDATA[<h1 id="P2-Study"><a href="#P2-Study" class="headerlink" title="P2_Study"></a>P2_Study</h1><h2 id="MIPS教程-amp-大黑书学习"><a href="#MIPS教程-amp-大黑书学习" class="headerlink" title="MIPS教程&amp;大黑书学习"></a>MIPS教程&amp;大黑书学习</h2><h3 id="常用寄存器"><a href="#常用寄存器" class="headerlink" title="常用寄存器"></a>常用寄存器</h3><ol>
 <li>寄存器使用规范</li>
 </ol>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P2/%E5%AF%84%E5%AD%98%E5%99%A8%E4%BD%BF%E7%94%A8%E8%A7%84%E8%8C%83.jpg"
-                      alt="1"
-                > </p>
+<p><img src="/P2/%E5%AF%84%E5%AD%98%E5%99%A8%E4%BD%BF%E7%94%A8%E8%A7%84%E8%8C%83.jpg" alt="1"> </p>
 <ol start="2">
 <li><strong>注意</strong><br>在输入输出的系统调用时，会涉及对于<code>$a0</code>和<code>$v0</code>寄存器的值的改变，尤其是对于<code>$a0</code>寄存器<br>要么在主程序中避免使用（比如从<code>$a1</code>开始保存参数）<br>要么在系统调用时对于<code>$a0</code>寄存器进行保护<div class="highlight-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 保护示例</span></span><br><span class="line"><span class="meta">.macro</span> ptintInt(%src)</span><br><span class="line">  push($<span class="built_in">a0</span>) <span class="comment"># push</span></span><br><span class="line">  <span class="keyword">add </span>$<span class="built_in">a0</span>,%src,$<span class="built_in">zero</span></span><br><span class="line">  li $<span class="built_in">v0</span>,<span class="number">1</span></span><br><span class="line">  <span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span>  pop($<span class="built_in">a0</span>) <span class="comment"># pop</span></span><br><span class="line">.end_macro</span><br></pre></td></tr></table></figure></div></li>
 </ol>
@@ -248,45 +173,15 @@
 <li>存取指令<br>① <code>sw</code>与<code>lw</code>指令，以字为单位（4Byte）进行存取，每次存取32位<br>② <code>sb</code>与<code>lb</code>指令，以字节为单位（1Byte）进行存取<br><code>lbu</code>：将相应地址的字节（8位）装入寄存器的最低有效字节，并用0填充寄存器的剩下字节<br><code>lb</code>：同lbu，不过最后是使用符号扩展来填充寄存器的剩下字节<br><code>sb</code>：将寄存器的最低有效字节存储到指定地址字节<br>因为MIPS本就是以字节为单位操作的，所以每次对于字节操作，移位只用以1为单位即可<br>来点栗子：<div class="highlight-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="code"><pre><span class="line"><span class="comment"># $s0 = base addr of chararray $s1 = i</span></span><br><span class="line">   <span class="keyword">addi </span>$<span class="built_in">s1</span>,$<span class="built_in">zero</span>,<span class="number">0</span> <span class="comment"># i = 0</span></span><br><span class="line">   <span class="keyword">addi </span>$<span class="built_in">t0</span>,$<span class="built_in">zero</span>,<span class="number">10</span> <span class="comment"># t0 = 10</span></span><br><span class="line"><span class="symbol">loop:</span></span><br><span class="line">   <span class="keyword">beq </span>$<span class="built_in">s1</span>,$<span class="built_in">t0</span>,done <span class="comment"># i = 10,exit loop</span></span><br><span class="line">   <span class="keyword">add </span>$<span class="built_in">t1</span>,$<span class="built_in">s0</span>,$<span class="built_in">s1</span> <span class="comment"># t1 = index = addr0 + i</span></span><br><span class="line">   <span class="keyword">lb </span>$<span class="built_in">t2</span>,<span class="number">0</span>($<span class="built_in">t1</span>) <span class="comment"># t2 = array[i]</span></span><br><span class="line">   <span class="keyword">addi </span>$<span class="built_in">t2</span>,$<span class="built_in">t2</span>,-<span class="number">32</span> <span class="comment"># xiaoxie -&gt; daxie</span></span><br><span class="line">   <span class="keyword">sb </span>$<span class="built_in">t2</span>,<span class="number">0</span>($<span class="built_in">t1</span>) <span class="comment"># store the new value</span></span><br><span class="line">   <span class="keyword">addi </span>$<span class="built_in">s1</span>,$<span class="built_in">s1</span>,<span class="number">1</span> <span class="comment"># i++</span></span><br><span class="line">   <span class="keyword">j </span>loop </span><br><span class="line"><span class="symbol">done:</span></span><br><span class="line">   <span class="comment"># ......</span></span><br></pre></td></tr></table></figure></div></li>
 </ol>
 <h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><ol>
-<li>新建数组<br>注意.word与.space的区别，这里直接上评论区同学的总结<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P2/.word&.space1.jpg"
-                      alt="1"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P2/.word&.space2.jpg"
-                      alt="1"
-                ></li>
+<li>新建数组<br>注意.word与.space的区别，这里直接上评论区同学的总结<br><img src="/P2/.word&.space1.jpg" alt="1"><br><img src="/P2/.word&.space2.jpg" alt="1"></li>
 <li>数组访问<br>注意以字为单位（int）每次移位4，以字节为单位（char）每次移位1<br>利用lb&#x2F;lbu sb lw sw 等指令实现对数组的访问和改变</li>
 </ol>
 <h3 id="函数调用"><a href="#函数调用" class="headerlink" title="函数调用"></a><strong>函数调用</strong></h3><p><strong>大黑书P200-P206讲得很清楚</strong></p>
 <ol>
-<li>函数调用与返回<br>MIPS使用jal来调用一个函数，使用jr指令从函数返回<br>jal完成两种功能：<br>①将下一条指令（jal后面的那条指令）的地址存储到寄存器$ra中<br>②跳转到目标指令<br>jr：跳转到寄存器保存的地址<br>来点栗子：<br>不涉及传参的函数<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P2/%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8sample.jpg"
-                      alt="1"
-                ><br>带有传参和函数返回值的函数<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P2/%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8sample2.jpg"
-                      alt="1"
-                ></li>
+<li>函数调用与返回<br>MIPS使用jal来调用一个函数，使用jr指令从函数返回<br>jal完成两种功能：<br>①将下一条指令（jal后面的那条指令）的地址存储到寄存器$ra中<br>②跳转到目标指令<br>jr：跳转到寄存器保存的地址<br>来点栗子：<br>不涉及传参的函数<br><img src="/P2/%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8sample.jpg" alt="1"><br>带有传参和函数返回值的函数<br><img src="/P2/%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8sample2.jpg" alt="1"></li>
 <li>寄存器保护<br>函数调用前后要注意保存和维护寄存器，避免被调用函数改变寄存器的值而对调用者产生影响<br>① <code>$s0</code><del><code>$s7</code> 保存局部变量时，要保护（就是调用者用到了而且调用函数可能改变的寄存器都要保护）<br>② <code>$ra</code> 要保护，这样才能知道函数返回哪里<br>③ <code>$v0</code></del><code>$v1</code> 不用保护，因为函数要将返回结果（如果有的话）存入这些寄存器中<br>利用栈来保护寄存器，使用push和pop操作</li>
-<li>递归函数调用<br><strong>保护好寄存器！！！</strong><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P2/%E9%80%92%E5%BD%92%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8.jpg"
-                      alt="1"
-                ></li>
-<li>栈的使用<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P2/%E6%A0%88%E7%9A%84%E4%BD%BF%E7%94%A8.jpg"
-                      alt="1"
-                ></li>
+<li>递归函数调用<br><strong>保护好寄存器！！！</strong><br><img src="/P2/%E9%80%92%E5%BD%92%E5%87%BD%E6%95%B0%E8%B0%83%E7%94%A8.jpg" alt="1"></li>
+<li>栈的使用<br><img src="/P2/%E6%A0%88%E7%9A%84%E4%BD%BF%E7%94%A8.jpg" alt="1"></li>
 </ol>
 <h2 id="板子"><a href="#板子" class="headerlink" title="板子"></a>板子</h2><ol>
 <li>print<div class="highlight-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="code"><pre><span class="line"><span class="meta">.macro</span>  printInt(%src)</span><br><span class="line">     <span class="keyword">add </span>$<span class="built_in">a0</span>,%src,$<span class="built_in">zero</span></span><br><span class="line">     li $<span class="built_in">v0</span>,<span class="number">1</span></span><br><span class="line">     <span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span>.end_macro</span><br><span class="line"></span><br><span class="line"><span class="meta">.macro</span> printStr(%src)</span><br><span class="line">     la $<span class="built_in">a0</span>,%src <span class="comment"># load label</span></span><br><span class="line">     li $<span class="built_in">v0</span>,<span class="number">4</span></span><br><span class="line">     <span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span> .end_macro</span><br></pre></td></tr></table></figure></div></li>
@@ -306,12 +201,7 @@
 <h3 id="回文串判断"><a href="#回文串判断" class="headerlink" title="回文串判断"></a>回文串判断</h3><p>简单的c程序翻译就好，需要注意的是利用$v0 &#x3D; 12来读入字符（$v0 &#x3D; 8会读入行尾换行符，不知道为啥，就这样吧）</p>
 <h3 id="卷积运算"><a href="#卷积运算" class="headerlink" title="卷积运算"></a>卷积运算</h3><p>矩阵乘法plus版，临时寄存器的使用有点多，注意勿混</p>
 <h3 id="全排列"><a href="#全排列" class="headerlink" title="全排列"></a>全排列</h3><p>先上C代码  </p>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P2/%E5%85%A8%E6%8E%92%E5%88%97c.jpg"
-                      alt="1"
-                ><br><strong>注意</strong> 递归调用一定要保护好递归前后的变量!!!</p>
+<p><img src="/P2/%E5%85%A8%E6%8E%92%E5%88%97c.jpg" alt="1"><br><strong>注意</strong> 递归调用一定要保护好递归前后的变量!!!</p>
 <div class="highlight-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="code"><pre><span class="line">   #</span><br><span class="line">   push($<span class="built_in">ra</span>) <span class="comment"># can also at the beginning</span></span><br><span class="line">   push($<span class="built_in">a1</span>)</span><br><span class="line">   push($<span class="built_in">t0</span>)</span><br><span class="line">   <span class="keyword">addi </span>$<span class="built_in">a1</span>,$<span class="built_in">a1</span>,<span class="number">1</span> <span class="comment"># index = index+1</span></span><br><span class="line">   <span class="keyword">jal </span>FullArray <span class="comment">###</span></span><br><span class="line">   pop($<span class="built_in">t0</span>)</span><br><span class="line">   pop($<span class="built_in">a1</span>)</span><br><span class="line">   pop($<span class="built_in">ra</span>) <span class="comment"># can also at the return</span></span><br><span class="line">   #</span><br><span class="line"><span class="symbol">return:</span></span><br><span class="line">   <span class="keyword">jr </span>$<span class="built_in">ra</span></span><br></pre></td></tr></table></figure></div>
 <h3 id="迷宫"><a href="#迷宫" class="headerlink" title="迷宫"></a>迷宫</h3><ol>
 <li>不确定是否要保护的寄存器，只要递归前后涉及改变就push和pop</li>
@@ -343,30 +233,15 @@
   <entry>
     <title>P3</title>
     <url>/2023/01/02/P3/</url>
-    <content><![CDATA[<h1 id="P3-Study"><a href="#P3-Study" class="headerlink" title="P3_Study"></a>P3_Study</h1><h1 id="1-单周期CPU设计方案"><a href="#1-单周期CPU设计方案" class="headerlink" title="1 单周期CPU设计方案"></a>1 单周期CPU设计方案</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所呈现的是利用logisim实现的MIPS架构CPU，可以支持8条指令，含有IFU、GRF、ALU、DM、Controller、BranchControl、EXT、NPC模块。整体设计实现采用自下而上的设计思路，先逐一设计搭建每个子模块，再将所有子模块整合连接，从而实现完整的数据通路。<br>CPU顶层模块如下：<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/P3CPU%E9%A1%B6%E5%B1%82%E6%A8%A1%E5%9D%971.jpg"
-                      alt="1"
-                ></p>
+    <content><![CDATA[<h1 id="P3-Study"><a href="#P3-Study" class="headerlink" title="P3_Study"></a>P3_Study</h1><h1 id="1-单周期CPU设计方案"><a href="#1-单周期CPU设计方案" class="headerlink" title="1 单周期CPU设计方案"></a>1 单周期CPU设计方案</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所呈现的是利用logisim实现的MIPS架构CPU，可以支持8条指令，含有IFU、GRF、ALU、DM、Controller、BranchControl、EXT、NPC模块。整体设计实现采用自下而上的设计思路，先逐一设计搭建每个子模块，再将所有子模块整合连接，从而实现完整的数据通路。<br>CPU顶层模块如下：<br><img src="/P3/P3CPU%E9%A1%B6%E5%B1%82%E6%A8%A1%E5%9D%971.jpg" alt="1"></p>
 <h2 id="1-2-实现指令说明"><a href="#1-2-实现指令说明" class="headerlink" title="1.2 实现指令说明"></a>1.2 实现指令说明</h2><h3 id="1-2-1-R型指令"><a href="#1-2-1-R型指令" class="headerlink" title="1.2.1 R型指令"></a>1.2.1 R型指令</h3><p>算术指令：add(暂视为不做溢出检查)，sub（暂视为不做溢出检查）<br>若要扩展支持其他R型指令，主要改变Controller模块与ALU模块  </p>
 <h3 id="1-2-2-I型指令"><a href="#1-2-2-I型指令" class="headerlink" title="1.2.2 I型指令"></a>1.2.2 I型指令</h3><p>B类指令：beq<br>算术指令：lui，ori<br>访存指令：lw，sw<br>若要扩展支持其他I型指令，主要改变Controller模块，EXT模块，ALU模块</p>
 <h3 id="1-2-3-J型指令"><a href="#1-2-3-J型指令" class="headerlink" title="1.2.3 J型指令"></a>1.2.3 J型指令</h3><p>本CPU不支持J型指令，若要支持j，jr等指令可做以下拓展：<br>①Controller模块增加JR与JUMP信号输出<br>②NPC模块增加JR与JUMP信号输入、将Imm16改为Imm26、增加GPR[ra]数据输入</p>
 <h3 id="1-2-4-其他"><a href="#1-2-4-其他" class="headerlink" title="1.2.4 其他"></a>1.2.4 其他</h3><p>nop</p>
 <h2 id="1-3-数据通路模块"><a href="#1-3-数据通路模块" class="headerlink" title="1.3 数据通路模块"></a>1.3 数据通路模块</h2><h3 id="1-3-1-IFU（取指令单元）"><a href="#1-3-1-IFU（取指令单元）" class="headerlink" title="1.3.1 IFU（取指令单元）"></a>1.3.1 IFU（取指令单元）</h3><p>该模块包含PC（程序计数器）和IM（指令存储器），PC通过32位寄存器实现，存储当前需执行指令的地址，IM通过ROM实现（32 * 32bit），存储所有需要执行的指令。根据PC的值从IM中取出对应指令传入后续数据通路。<br><strong>注意</strong> ：<br>ROM中是以字为单位存储的，并且ROM容量为32条指令，只需五位数表示地址，所以取PC的6<del>2位即可。同理，若ROM容量为1024*32bit则取PC的11</del>2位。  </p>
 <ul>
-<li>模块外观<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/IFU.jpg"
-                      alt="1"
-                >  </li>
-<li>模块内部电路<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/IFU%E7%94%B5%E8%B7%AF.jpg"
-                      alt="1"
-                > </li>
+<li>模块外观<br><img src="/P3/IFU.jpg" alt="1">  </li>
+<li>模块内部电路<br><img src="/P3/IFU%E7%94%B5%E8%B7%AF.jpg" alt="1"> </li>
 <li>端口定义  <table>
 <thead>
 <tr>
@@ -466,18 +341,8 @@
 </ul>
 <h3 id="1-3-2-GRF（通用寄存器组）"><a href="#1-3-2-GRF（通用寄存器组）" class="headerlink" title="1.3.2 GRF（通用寄存器组）"></a>1.3.2 GRF（通用寄存器组）</h3><p>该模块包含32个32位寄存器，对应MIPS架构中$0~$31通用寄存器，可以通过输入的5位地址访存寄存器，其中，$0寄存器设置写入信息为const0。  </p>
 <ul>
-<li>模块外观<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/GRF.jpg"
-                      alt="1"
-                ></li>
-<li>模块内部电路<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/GRF%E7%94%B5%E8%B7%AF.jpg"
-                      alt="1"
-                ></li>
+<li>模块外观<br><img src="/P3/GRF.jpg" alt="1"></li>
+<li>模块内部电路<br><img src="/P3/GRF%E7%94%B5%E8%B7%AF.jpg" alt="1"></li>
 <li>端口定义<table>
 <thead>
 <tr>
@@ -565,18 +430,8 @@
 </ul>
 <h3 id="1-3-3-ALU（算术运算单元）"><a href="#1-3-3-ALU（算术运算单元）" class="headerlink" title="1.3.3 ALU（算术运算单元）"></a>1.3.3 ALU（算术运算单元）</h3><p>该模块可以实现加、减、与、或运算，通过ALUOp信号选择何种运算，通过logisim内置算术运算与逻辑运算原件实现运算。</p>
 <ul>
-<li>模块外观<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/ALU.jpg"
-                      alt="1"
-                ></li>
-<li>模块内部电路<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/ALU%E7%94%B5%E8%B7%AF.jpg"
-                      alt="1"
-                ></li>
+<li>模块外观<br><img src="/P3/ALU.jpg" alt="1"></li>
+<li>模块内部电路<br><img src="/P3/ALU%E7%94%B5%E8%B7%AF.jpg" alt="1"></li>
 <li>端口定义<table>
 <thead>
 <tr>
@@ -621,18 +476,8 @@
 </ol>
 <h3 id="1-3-4-DM（数据存储器）"><a href="#1-3-4-DM（数据存储器）" class="headerlink" title="1.3.4 DM（数据存储器）"></a>1.3.4 DM（数据存储器）</h3><p>该模块利用RAM元件实现对数据的访存<br><strong>注意</strong>：<br>①RAM要设置separate load and store ports<br>②RAM写使能端不可浮空，否则会随机写入</p>
 <ul>
-<li>模块外观<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/DM.jpg"
-                      alt="1"
-                ></li>
-<li>模块内部电路<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/DM%E7%94%B5%E8%B7%AF.jpg"
-                      alt="1"
-                ></li>
+<li>模块外观<br><img src="/P3/DM.jpg" alt="1"></li>
+<li>模块内部电路<br><img src="/P3/DM%E7%94%B5%E8%B7%AF.jpg" alt="1"></li>
 <li>端口定义<table>
 <thead>
 <tr>
@@ -703,28 +548,8 @@
 </ul>
 <h3 id="1-3-5-Controller（控制器）"><a href="#1-3-5-Controller（控制器）" class="headerlink" title="1.3.5 Controller（控制器）"></a>1.3.5 Controller（控制器）</h3><p>通过解码Opcode（31<del>25）和func（5</del>0）以及Instr整体，输出当前指令对应的控制信号。主要组成是AND逻辑——当前是和指令；OR逻辑——当前指令对应的信号输出。</p>
 <ul>
-<li>模块外观<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/Controller1%E5%A4%96%E8%A7%82.jpg"
-                      alt="1"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/Controller1appearance.jpg"
-                      alt="1"
-                ></li>
-<li>模块内部电路<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/Controller1.jpg"
-                      alt="1"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/Controller1%E7%94%B5%E8%B7%AF.jpg"
-                      alt="1"
-                ></li>
+<li>模块外观<br><img src="/P3/Controller1%E5%A4%96%E8%A7%82.jpg" alt="1"><br><img src="/P3/Controller1appearance.jpg" alt="1"></li>
+<li>模块内部电路<br><img src="/P3/Controller1.jpg" alt="1"><br><img src="/P3/Controller1%E7%94%B5%E8%B7%AF.jpg" alt="1"></li>
 <li>端口定义<table>
 <thead>
 <tr>
@@ -833,18 +658,8 @@
 </ul>
 <h3 id="1-3-6-BranchControl（B类指令控制模块）"><a href="#1-3-6-BranchControl（B类指令控制模块）" class="headerlink" title="1.3.6 BranchControl（B类指令控制模块）"></a>1.3.6 BranchControl（B类指令控制模块）</h3><p>该模块主要用于处理B类指令是否跳转，B类指令可以跳转有两个条件：①是B类指令②满足跳转要求</p>
 <ul>
-<li>模块外观<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/BranchControl.jpg"
-                      alt="1"
-                ></li>
-<li>模块内部电路<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/BranchControl%E7%94%B5%E8%B7%AF.jpg"
-                      alt="1"
-                ></li>
+<li>模块外观<br><img src="/P3/BranchControl.jpg" alt="1"></li>
+<li>模块内部电路<br><img src="/P3/BranchControl%E7%94%B5%E8%B7%AF.jpg" alt="1"></li>
 <li>端口定义<table>
 <thead>
 <tr>
@@ -893,18 +708,8 @@
 </ul>
 <h3 id="1-3-7-EXT（扩展单元）"><a href="#1-3-7-EXT（扩展单元）" class="headerlink" title="1.3.7 EXT（扩展单元）"></a>1.3.7 EXT（扩展单元）</h3><p>本模块根据不同指令对立即数的扩展需要对立即数进行扩展</p>
 <ul>
-<li>模块外观<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/EXT.jpg"
-                      alt="1"
-                ></li>
-<li>模块内部电路<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/EXT%E7%94%B5%E8%B7%AF.jpg"
-                      alt="1"
-                ></li>
+<li>模块外观<br><img src="/P3/EXT.jpg" alt="1"></li>
+<li>模块内部电路<br><img src="/P3/EXT%E7%94%B5%E8%B7%AF.jpg" alt="1"></li>
 <li>端口定义<table>
 <thead>
 <tr>
@@ -952,18 +757,8 @@
 </ul>
 <h3 id="1-3-8-NPC（计算下一条指令的地址）"><a href="#1-3-8-NPC（计算下一条指令的地址）" class="headerlink" title="1.3.8 NPC（计算下一条指令的地址）"></a>1.3.8 NPC（计算下一条指令的地址）</h3><p>该模块用于计算下一条需要执行的指令的地址</p>
 <ul>
-<li>模块外观<br> <img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/NPC.jpg"
-                      alt="1"
-                ></li>
-<li>模块内部电路<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/NPC%E7%94%B5%E8%B7%AF.jpg"
-                      alt="1"
-                ></li>
+<li>模块外观<br> <img src="/P3/NPC.jpg" alt="1"></li>
+<li>模块内部电路<br><img src="/P3/NPC%E7%94%B5%E8%B7%AF.jpg" alt="1"></li>
 <li>端口定义<table>
 <thead>
 <tr>
@@ -1017,27 +812,7 @@
 <li>可能的拓展<br>主要是对于J类指令的拓展<br>对于J需要增加指令25~0位输入，对于jal还需增加PC+4输出，对于jr指令需增加$ra的数据输入。然后利用splitter和mux实现最终的NPC输出。</li>
 </ul>
 <h1 id="2-测试方案"><a href="#2-测试方案" class="headerlink" title="2 测试方案"></a>2 测试方案</h1><h2 id="2-1-典型测试样例"><a href="#2-1-典型测试样例" class="headerlink" title="2.1 典型测试样例"></a>2.1 典型测试样例</h2><div class="highlight-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 算术指令</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="built_in">a0</span>, $<span class="number">0</span>, <span class="number">123</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="built_in">a1</span>, $<span class="built_in">a0</span>, <span class="number">456</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="built_in">a2</span>,$<span class="built_in">a1</span>,<span class="number">65534</span></span><br><span class="line"><span class="keyword">lui </span>$<span class="built_in">a3</span>, <span class="number">123</span>            </span><br><span class="line"><span class="keyword">lui </span>$<span class="built_in">t4</span>, <span class="number">0xffff</span></span><br><span class="line"><span class="keyword">lui </span>$<span class="built_in">t1</span>,<span class="number">42528</span>         </span><br><span class="line"><span class="keyword">ori </span>$<span class="built_in">a3</span>, $<span class="built_in">a3</span>, <span class="number">0xffff</span>    </span><br><span class="line"><span class="keyword">add </span>$<span class="built_in">s0</span>, $<span class="built_in">a0</span>, $<span class="built_in">a2</span>      </span><br><span class="line"><span class="keyword">add </span>$<span class="built_in">s1</span>, $<span class="built_in">a0</span>, $<span class="built_in">a3</span>      </span><br><span class="line"><span class="keyword">add </span>$<span class="built_in">s2</span>, $<span class="built_in">a3</span>, $<span class="built_in">a3</span></span><br><span class="line"><span class="keyword">sub </span>$<span class="built_in">t2</span>,$<span class="built_in">t1</span>,$<span class="built_in">a0</span></span><br><span class="line"><span class="keyword">sub </span>$<span class="built_in">t3</span>,$<span class="built_in">t2</span>,$<span class="built_in">a2</span>      </span><br><span class="line"><span class="keyword">ori </span>$<span class="built_in">t0</span>, $<span class="number">0</span>, <span class="number">0x0000</span></span><br><span class="line"><span class="comment"># 访存指令</span></span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">a0</span>, <span class="number">0</span>($<span class="built_in">t0</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">a1</span>, <span class="number">4</span>($<span class="built_in">t0</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">t5</span>, <span class="number">8</span>($<span class="built_in">t0</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">t6</span>, <span class="number">12</span>($<span class="built_in">t0</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">t7</span>, <span class="number">16</span>($<span class="built_in">t0</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">t8</span>, <span class="number">20</span>($<span class="built_in">t0</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">t9</span>, <span class="number">24</span>($<span class="built_in">t0</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">a0</span>, <span class="number">0</span>($<span class="built_in">t0</span>)</span><br><span class="line"><span class="keyword">lw </span>$<span class="built_in">a1</span>, <span class="number">12</span>($<span class="built_in">t0</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">a0</span>, <span class="number">28</span>($<span class="built_in">t0</span>)</span><br><span class="line"><span class="keyword">sw </span>$<span class="built_in">a1</span>, <span class="number">32</span>($<span class="built_in">t0</span>)</span><br><span class="line"><span class="comment"># 跳转指令</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="built_in">s4</span>, $<span class="number">0</span>, <span class="number">1</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="built_in">s5</span>, $<span class="number">0</span>, <span class="number">2</span></span><br><span class="line"><span class="keyword">ori </span>$<span class="built_in">s6</span>, $<span class="number">0</span>, <span class="number">1</span></span><br><span class="line"><span class="keyword">beq </span>$<span class="built_in">s4</span>, $<span class="built_in">s6</span>, loop1     </span><br><span class="line"><span class="keyword">beq </span>$<span class="built_in">s4</span>, $<span class="built_in">s5</span>, loop2     </span><br><span class="line"><span class="symbol">loop1:</span><span class="keyword">sw </span>$<span class="built_in">s2</span>, <span class="number">36</span>($<span class="built_in">t0</span>)</span><br><span class="line"><span class="keyword">lui </span>$<span class="built_in">s7</span>,<span class="number">65535</span></span><br><span class="line"><span class="symbol">loop2:</span><span class="keyword">sw </span>$<span class="built_in">s3</span>, <span class="number">40</span>($<span class="built_in">t0</span>)</span><br><span class="line"></span><br></pre></td></tr></table></figure></div>
-<p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/test2.jpg"
-                      alt="1"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/test2.1.jpg"
-                      alt="1"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/test2.2.jpg"
-                      alt="1"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P3/test2.3.jpg"
-                      alt="1"
-                ><br>可见除$gp $sp 等特殊寄存器外，其他寄存器值相同<br>此外通过和同学对拍测试其他数据（包括边界数据65533、65535等），只有在使能端不关心这个数据（即这个数据并不进入这条指令对应的数据通路）时，数据会出现不同，其他情况下输出相同。</p>
+<p><img src="/P3/test2.jpg" alt="1"><br><img src="/P3/test2.1.jpg" alt="1"><br><img src="/P3/test2.2.jpg" alt="1"><br><img src="/P3/test2.3.jpg" alt="1"><br>可见除$gp $sp 等特殊寄存器外，其他寄存器值相同<br>此外通过和同学对拍测试其他数据（包括边界数据65533、65535等），只有在使能端不关心这个数据（即这个数据并不进入这条指令对应的数据通路）时，数据会出现不同，其他情况下输出相同。</p>
 <h2 id="2-2-自动测试工具"><a href="#2-2-自动测试工具" class="headerlink" title="2.2 自动测试工具"></a>2.2 自动测试工具</h2><p>该python程序可以实现将MIPS程序text.asm 转化成rom.txt并自动加载进存有cpu电路文件P3_v2.circ的ROM元件中，并生成新的电路文件P3_v2_remake.circ<br>使用虚拟机里python3然后CTRL+D退出，然后cd到python文件所在文件夹，输入<code>python3 -u &lt;filename&gt;.py</code> 即可执行python文件。</p>
 <div class="highlight-container" data-rel="Python"><figure class="iseeu highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> re</span><br><span class="line">command = <span class="string">&quot;java -jar Mars4_5.jar text1.asm nc mc CompactTextAtZero a dump .text HexText rom.txt&quot;</span></span><br><span class="line">os.system(command)</span><br><span class="line">content = <span class="built_in">open</span>(<span class="string">&quot;rom.txt&quot;</span>).read()</span><br><span class="line"></span><br><span class="line">circ = <span class="built_in">open</span>(<span class="string">&quot;P3_v2.circ&quot;</span>, encoding=<span class="string">&quot;utf-8&quot;</span>).read()</span><br><span class="line">circ = re.sub(<span class="string">r&#x27;addr/data: 5 32([\s\S]*)&lt;/a&gt;&#x27;</span>, <span class="string">&quot;addr/data: 5 32\n&quot;</span> + content + <span class="string">&quot;&lt;/a&gt;&quot;</span>, circ)</span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;P3_v2_remake.circ&quot;</span>, <span class="string">&quot;w&quot;</span>, encoding=<span class="string">&quot;utf-8&quot;</span>) <span class="keyword">as</span> file:</span><br><span class="line">    file.write(circ)</span><br></pre></td></tr></table></figure></div>
 <h1 id="3-思考题解答"><a href="#3-思考题解答" class="headerlink" title="3 思考题解答"></a>3 思考题解答</h1><ol>
@@ -1699,17 +1474,7 @@
   <entry>
     <title>P5</title>
     <url>/2023/01/02/P5/</url>
-    <content><![CDATA[<h1 id="1-P5-流水线CPU设计方案"><a href="#1-P5-流水线CPU设计方案" class="headerlink" title="1 P5 流水线CPU设计方案"></a>1 P5 流水线CPU设计方案</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所设计的为Verilog实现的流水线MIPS架构CPU，该CPU支持10条指令，为此，笔者设计了PC,IM,D_Reg,D_MCU,CMP,GRF,EXT,NPC,E_Reg,E_MCU,ALU,M_Reg,M_MCU,DM,W_Reg,W_MCU模块。整体搭建采用自下而上的方式完成，该CPU的译码方式是分布式译码。<br>顶层模块设计图如下<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P5/%E8%AE%BE%E8%AE%A1%E5%9B%BE.png"
-                      alt="1"
-                ><br>信号控制如下<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P5/%E4%BF%A1%E5%8F%B7.png"
-                      alt="1"
-                ></p>
+    <content><![CDATA[<h1 id="1-P5-流水线CPU设计方案"><a href="#1-P5-流水线CPU设计方案" class="headerlink" title="1 P5 流水线CPU设计方案"></a>1 P5 流水线CPU设计方案</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所设计的为Verilog实现的流水线MIPS架构CPU，该CPU支持10条指令，为此，笔者设计了PC,IM,D_Reg,D_MCU,CMP,GRF,EXT,NPC,E_Reg,E_MCU,ALU,M_Reg,M_MCU,DM,W_Reg,W_MCU模块。整体搭建采用自下而上的方式完成，该CPU的译码方式是分布式译码。<br>顶层模块设计图如下<br><img src="/P5/%E8%AE%BE%E8%AE%A1%E5%9B%BE.png" alt="1"><br>信号控制如下<br><img src="/P5/%E4%BF%A1%E5%8F%B7.png" alt="1"></p>
 <h2 id="1-2-实现指令说明"><a href="#1-2-实现指令说明" class="headerlink" title="1.2 实现指令说明"></a>1.2 实现指令说明</h2><ul>
 <li>cal_R : add,sub</li>
 <li>cal_I :ori,lui(这里lui视为将立即数extend后的加法指令)</li>
@@ -3069,18 +2834,8 @@
 <h1 id="祝P5上机一切顺利！"><a href="#祝P5上机一切顺利！" class="headerlink" title="祝P5上机一切顺利！"></a>祝P5上机一切顺利！</h1><h1 id="11-x2F-15-P5第一次上机"><a href="#11-x2F-15-P5第一次上机" class="headerlink" title="11&#x2F;15 P5第一次上机"></a>11&#x2F;15 P5第一次上机</h1><p>失败了失败了失败了<br>失败是成功之母，下周一定能过！<br>总的来说还是和往年题一样，条件存储 + 链接条件跳转 +  计算，注意题目顺序吧</p>
 <ol>
 <li>条件存储但是题目记不清楚了qaq，最难的放第一个了</li>
-<li>原题，题目如下<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P5/P5T2.png"
-                      alt="1"
-                ><br>跟同学交流还是在判断D级当前指令是bonall且符合条件，那么就把F_instr 变成nop<br>maybe课下有bug或者哪里连错了？<br>这次上机好慌乱，顶层模块有一个注释直接把下一句话干没了。还有不要急着提交，应该每个信号都连好，自己把数据通路走一遍看有没有问题。有一些信号没连上的错误然后一直提交评测也好搞心态。<br>啊啊啊啊啊，判断相反数也写错了，应该是<code>（r1 + r2 == 32&#39;d0）&amp;&amp; (!((r1 == 32&#39;h8000_0000)&amp;&amp;(r2 == 32&#39;h8000_0000)))</code>不能同时为<code>32&#39;h8000_0000</code>写成都不能为<code>32&#39;h8000_0000</code>,错的好离谱</li>
-<li>addoi<br>一个算术指令GPR[base] + imm，然后取反得temp，输出temp原码（还是补码，忘记了qaq）<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P5/%E5%8E%9F%E7%A0%81%E5%8F%8D%E7%A0%81%E8%A1%A5%E7%A0%81.jpg"
-                      alt="1"
-                ><br><strong>取反是取相反数不是按位取反啊啊啊啊啊</strong><br>黑底的设计稿图片课上看的很难受，而且信号也不明显<br>要自己写简单的testbench，测了再交。不要着急提交。<br>我今天晚上在干什么呀</li>
+<li>原题，题目如下<br><img src="/P5/P5T2.png" alt="1"><br>跟同学交流还是在判断D级当前指令是bonall且符合条件，那么就把F_instr 变成nop<br>maybe课下有bug或者哪里连错了？<br>这次上机好慌乱，顶层模块有一个注释直接把下一句话干没了。还有不要急着提交，应该每个信号都连好，自己把数据通路走一遍看有没有问题。有一些信号没连上的错误然后一直提交评测也好搞心态。<br>啊啊啊啊啊，判断相反数也写错了，应该是<code>（r1 + r2 == 32&#39;d0）&amp;&amp; (!((r1 == 32&#39;h8000_0000)&amp;&amp;(r2 == 32&#39;h8000_0000)))</code>不能同时为<code>32&#39;h8000_0000</code>写成都不能为<code>32&#39;h8000_0000</code>,错的好离谱</li>
+<li>addoi<br>一个算术指令GPR[base] + imm，然后取反得temp，输出temp原码（还是补码，忘记了qaq）<br><img src="/P5/%E5%8E%9F%E7%A0%81%E5%8F%8D%E7%A0%81%E8%A1%A5%E7%A0%81.jpg" alt="1"><br><strong>取反是取相反数不是按位取反啊啊啊啊啊</strong><br>黑底的设计稿图片课上看的很难受，而且信号也不明显<br>要自己写简单的testbench，测了再交。不要着急提交。<br>我今天晚上在干什么呀</li>
 </ol>
 <h1 id="11-x2F-22-P5第二次上机"><a href="#11-x2F-22-P5第二次上机" class="headerlink" title="11&#x2F;22 P5第二次上机"></a>11&#x2F;22 P5第二次上机</h1><p>实在惊险，20：58提交通过</p>
 <ol>
@@ -3099,12 +2854,7 @@
   <entry>
     <title>P6</title>
     <url>/2023/01/02/P6/</url>
-    <content><![CDATA[<h1 id="1-P5-流水线CPU设计方案"><a href="#1-P5-流水线CPU设计方案" class="headerlink" title="1 P5 流水线CPU设计方案"></a>1 P5 流水线CPU设计方案</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所设计的为Verilog实现的流水线MIPS架构CPU，该CPU支持28条指令，为此，笔者设计了PC，D_Reg, CMP，GRF，EXT，NPC，E_Reg,MDU，ALU，M_Reg,Load,Store,W_Reg,HCU模块，其中IM和DM通过外设实现。整体搭建采用自下而上的方式完成，该CPU的译码方式是分布式译码。<br>顶层模块设计图如下<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P6/%E8%AE%BE%E8%AE%A1%E7%A8%BF(1).jpg"
-                      alt="1"
-                > </p>
+    <content><![CDATA[<h1 id="1-P5-流水线CPU设计方案"><a href="#1-P5-流水线CPU设计方案" class="headerlink" title="1 P5 流水线CPU设计方案"></a>1 P5 流水线CPU设计方案</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所设计的为Verilog实现的流水线MIPS架构CPU，该CPU支持28条指令，为此，笔者设计了PC，D_Reg, CMP，GRF，EXT，NPC，E_Reg,MDU，ALU，M_Reg,Load,Store,W_Reg,HCU模块，其中IM和DM通过外设实现。整体搭建采用自下而上的方式完成，该CPU的译码方式是分布式译码。<br>顶层模块设计图如下<br><img src="/P6/%E8%AE%BE%E8%AE%A1%E7%A8%BF(1).jpg" alt="1"> </p>
 <h2 id="1-2-实现指令说明"><a href="#1-2-实现指令说明" class="headerlink" title="1.2 实现指令说明"></a>1.2 实现指令说明</h2><ul>
 <li>cal_R : add,sub,and,or,slt,sltu,lui</li>
 <li>cal_I : addi,andi,ori</li>
@@ -4595,17 +4345,7 @@
   <entry>
     <title>P7</title>
     <url>/2023/01/02/P7/</url>
-    <content><![CDATA[<h1 id="P7-Study"><a href="#P7-Study" class="headerlink" title="P7_Study"></a>P7_Study</h1><h2 id="设计概述"><a href="#设计概述" class="headerlink" title="设计概述"></a>设计概述</h2><p>本文设计的是又Verilog实现的MIPS微系统，该微系统支持33条汇编指令，为实现该功能，笔者设计PC，CMP，GRF，EXT，NPC，ALU，MD，Load，Store，CP0，D_Reg,E_Reg,M_Reg,W_Reg,MCU,HCU,Bridge,TC模块。<br>顶层结构如下：<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P7/P7%E9%A1%B6%E5%B1%82%E6%A8%A1%E5%9D%97.png"
-                      alt="1"
-                ><br>CPU内部如下：<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/P7/CPU%E5%86%85%E9%83%A8.png"
-                      alt="1"
-                ></p>
+    <content><![CDATA[<h1 id="P7-Study"><a href="#P7-Study" class="headerlink" title="P7_Study"></a>P7_Study</h1><h2 id="设计概述"><a href="#设计概述" class="headerlink" title="设计概述"></a>设计概述</h2><p>本文设计的是又Verilog实现的MIPS微系统，该微系统支持33条汇编指令，为实现该功能，笔者设计PC，CMP，GRF，EXT，NPC，ALU，MD，Load，Store，CP0，D_Reg,E_Reg,M_Reg,W_Reg,MCU,HCU,Bridge,TC模块。<br>顶层结构如下：<br><img src="/P7/P7%E9%A1%B6%E5%B1%82%E6%A8%A1%E5%9D%97.png" alt="1"><br>CPU内部如下：<br><img src="/P7/CPU%E5%86%85%E9%83%A8.png" alt="1"></p>
 <h2 id="指令说明"><a href="#指令说明" class="headerlink" title="指令说明"></a>指令说明</h2><ul>
 <li>cal_R : add,sub,and,or,slt,sltu,lui</li>
 <li>cal_I : addi,andi,ori</li>
@@ -5177,12 +4917,7 @@ EPC的确定以及对于Req的操作<div class="highlight-container" data-rel="V
 <li>判断输出时，可以把输出部分写在always块中，也可以写在always块外使用assign语句，assign相当于是组合逻辑中的一根线，输出会随着输入而发生变化<br>for example<div class="highlight-container" data-rel="Verilog"><figure class="iseeu highlight verilog"><table><tr><td class="code"><pre><span class="line">   <span class="keyword">always</span> @(<span class="keyword">posedge</span> clk, <span class="keyword">posedge</span> rst) <span class="comment">//异步复位</span></span><br><span class="line">   <span class="keyword">begin</span></span><br><span class="line">        <span class="comment">//</span></span><br><span class="line">   <span class="keyword">end</span></span><br><span class="line">   <span class="keyword">assign</span> ans = () ? <span class="number">1&#x27;b1</span> : <span class="number">1&#x27;b0</span>;</span><br><span class="line"><span class="comment">// another</span></span><br><span class="line">   <span class="keyword">always</span> @(<span class="keyword">posedge</span> clk,<span class="keyword">posedge</span> rst)</span><br><span class="line">   <span class="keyword">begin</span></span><br><span class="line">   <span class="comment">//</span></span><br><span class="line">   ans = () ? <span class="number">1&#x27;b1</span> : <span class="number">1&#x27;b0</span>;</span><br><span class="line">   <span class="keyword">end</span></span><br></pre></td></tr></table></figure></div></li>
 </ol>
 <h3 id="状态机"><a href="#状态机" class="headerlink" title="状态机"></a>状态机</h3><ol>
-<li>Moore与Meely的选择<br>不用在最初设计电路时过多区分<br>Moore机可以满足输出一个cycle的要求<br>Meely机可以满足最早输出（越快越好的要求）<br>（详见L4 P25 波形示意图）<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/Pre/1.png"
-                      alt="1"
-                ></li>
+<li>Moore与Meely的选择<br>不用在最初设计电路时过多区分<br>Moore机可以满足输出一个cycle的要求<br>Meely机可以满足最早输出（越快越好的要求）<br>（详见L4 P25 波形示意图）<br><img src="/Pre/1.png" alt="1"></li>
 <li>关键是次态逻辑与输出逻辑的设计<br>设计次态逻辑时，先想清楚你需要哪些状态，然后对这些状态进行编码，然后设计好状态转移图，根据图去编写代码<br>设计输出逻辑时，就要想清楚是Moore还是Meely，也就是说我的输入与当前输出是否有关</li>
 </ol>
 <h3 id="符号数处理"><a href="#符号数处理" class="headerlink" title="符号数处理"></a>符号数处理</h3><p>最保险的处理有符号数a:  </p>
@@ -5199,27 +4934,12 @@ EPC的确定以及对于Req的操作<div class="highlight-container" data-rel="V
 <h3 id="syscall"><a href="#syscall" class="headerlink" title="syscall"></a>syscall</h3><div class="highlight-container" data-rel="Mips"><figure class="iseeu highlight mips"><table><tr><td class="code"><pre><span class="line"><span class="comment">#字符串输出</span></span><br><span class="line">la $<span class="built_in">a0</span>,<span class="keyword">addr </span><span class="comment"># $a0：addr of the str；$a1: max size of the str；the end &#x27;\0&#x27;</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">4</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span></span><br><span class="line"><span class="comment">#整数输出</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">1</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span><span class="comment">#输出$a0寄存器中的值</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#读入一个整数</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">5</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span><span class="keyword">move </span>$<span class="built_in">s0</span>,$<span class="built_in">v0</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#读入一个字符串</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">8</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span><span class="comment"># $a0 :the addr; $a1: the maxsize</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#读入一个字符</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">12</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span><span class="comment"># $v0 cotains it</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#结束程序</span></span><br><span class="line">li $<span class="built_in">v0</span>,<span class="number">10</span></span><br><span class="line"><span class="keyword">syscall</span></span><br><span class="line"><span class="keyword"></span></span><br></pre></td></tr></table></figure></div>
 <h1 id="上机总结"><a href="#上机总结" class="headerlink" title="上机总结"></a>上机总结</h1><h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>此次pre考的比较基础，只过了Verilog，感觉对于基础知识模型要加强学习</p>
 <h2 id="Mealy机"><a href="#Mealy机" class="headerlink" title="Mealy机"></a>Mealy机</h2><p>此次Logisim和Verilog都考察的是Mealy型状态机  </p>
-<h3 id="Mealy机的基本电路设计"><a href="#Mealy机的基本电路设计" class="headerlink" title="Mealy机的基本电路设计"></a>Mealy机的基本电路设计</h3><p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/Pre/2.jpg"
-                      alt="1"
-                ></p>
+<h3 id="Mealy机的基本电路设计"><a href="#Mealy机的基本电路设计" class="headerlink" title="Mealy机的基本电路设计"></a>Mealy机的基本电路设计</h3><p><img src="/Pre/2.jpg" alt="1"></p>
 <h3 id="失误地方"><a href="#失误地方" class="headerlink" title="失误地方"></a>失误地方</h3><ol>
 <li>题意不清，应该是对于每个输入都会判断与之前输入之和是否大于等于5</li>
-<li>寄存器的使用,请注意en端口与clk端口<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/Pre/register.jpg"
-                      alt="1"
-                ></li>
+<li>寄存器的使用,请注意en端口与clk端口<br><img src="/Pre/register.jpg" alt="1"></li>
 </ol>
-<h3 id="助教学长的标程"><a href="#助教学长的标程" class="headerlink" title="助教学长的标程"></a>助教学长的标程</h3><p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/Pre/3.jpg"
-                      alt="1"
-                ><br>有疑问：  </p>
+<h3 id="助教学长的标程"><a href="#助教学长的标程" class="headerlink" title="助教学长的标程"></a>助教学长的标程</h3><p><img src="/Pre/3.jpg" alt="1"><br>有疑问：  </p>
 <ol>
 <li>没有实现大于零时清空寄存器<br>分析：使用mux实现的，如果all大于等于5，mux的选择端为1，mux输出为0，那么下一个时钟上升沿到来之时，register存入0，实现寄存器清零</li>
 <li>为什么这是Mealy机呀，感觉输出状态是由输入状态唯一决定的<br>分析：每一个时钟上升沿到来，寄存器存入当前多路选择器的输出值，与in相加并判断是否大于等于5（Mealy）</li>
@@ -5248,12 +4968,7 @@ EPC的确定以及对于Req的操作<div class="highlight-container" data-rel="V
 <li>功能分析<br>（可以先进行类似于表格的书面化说明，明白好设计思路与设计需求再去设计电路）</li>
 <li>分层设计与分模块设计<br>模块类似于函数的封装，便于理清思路、清晰电路、debug<br>eg1.Moore机与Mealy机都可以划分为状态转移、状态存储、输出模块<br>eg2.32位加法器分为多个一位加法器<br>PS：注意子电路的<strong>appearance</strong>，要跟题目要求一致</li>
 </ol>
-<h2 id="有限状态机"><a href="#有限状态机" class="headerlink" title="有限状态机"></a>有限状态机</h2><p>首先回顾一下Moore和Mealy叭！<br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/asset/Moore&Mealy.png"
-                      alt="1"
-                ></p>
+<h2 id="有限状态机"><a href="#有限状态机" class="headerlink" title="有限状态机"></a>有限状态机</h2><p>首先回顾一下Moore和Mealy叭！<br><img src="/asset/Moore&Mealy.png" alt="1"></p>
 <ol>
 <li>状态转移电路一般只是<strong>组合逻辑</strong>的计算，也就是说随着input的变化（无论clk处于什么状态），其计算的状态也相应发生，所以一定要有<em>状态存储</em>模块，clk处于上升沿时输出prev_state存入now_state</li>
 <li>对于组合逻辑部分，画好状态转移图，一个经济有效的方法就是<em>打表</em>，利用analyze circuit来实现  </li>
@@ -5271,17 +4986,7 @@ EPC的确定以及对于Req的操作<div class="highlight-container" data-rel="V
 <li>三态问题？什么时候用三态？（好像三态的输入用逻辑门运算会变红）<br>不用考虑三态</li>
 <li>二进制减法qaq不会（主要是ftoi那里）<br>扩展为32位，再用0去减<br>用0去减其实与非门等效</li>
 </ol>
-<h2 id="CRC"><a href="#CRC" class="headerlink" title="CRC"></a>CRC</h2><p><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/asset/CRC%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF.png"
-                      alt="1"
-                ><br><img  
-                     lazyload
-                     src="/images/loading.svg"
-                     data-src="/asset/CRC%E8%AE%A1%E7%AE%97%E8%BF%87%E7%A8%8B.png"
-                      alt="1"
-                ></p>
+<h2 id="CRC"><a href="#CRC" class="headerlink" title="CRC"></a>CRC</h2><p><img src="/asset/CRC%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF.png" alt="1"><br><img src="/asset/CRC%E8%AE%A1%E7%AE%97%E8%BF%87%E7%A8%8B.png" alt="1"></p>
 <ol>
 <li>体现了模块化的思想</li>
 <li>要审题，题目说了被除数是要拼接的</li>
