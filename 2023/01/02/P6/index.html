@@ -347,7 +347,7 @@
             
 
             <div class="article-content markdown-body">
-                <h1 id="1-P5-流水线CPU设计方案"><a href="#1-P5-流水线CPU设计方案" class="headerlink" title="1 P5 流水线CPU设计方案"></a>1 P5 流水线CPU设计方案</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所设计的为Verilog实现的流水线MIPS架构CPU，该CPU支持28条指令，为此，笔者设计了PC，D_Reg, CMP，GRF，EXT，NPC，E_Reg,MDU，ALU，M_Reg,Load,Store,W_Reg,HCU模块，其中IM和DM通过外设实现。整体搭建采用自下而上的方式完成，该CPU的译码方式是分布式译码。<br>顶层模块设计图如下<br><img lazyload src="/images/loading.svg" data-src="/P6/%E8%AE%BE%E8%AE%A1%E7%A8%BF(1).jpg" alt="1"> </p>
+                <h1 id="1-P5-流水线CPU设计方案"><a href="#1-P5-流水线CPU设计方案" class="headerlink" title="1 P5 流水线CPU设计方案"></a>1 P5 流水线CPU设计方案</h1><h2 id="1-1-设计概述"><a href="#1-1-设计概述" class="headerlink" title="1.1 设计概述"></a>1.1 设计概述</h2><p>本文所设计的为Verilog实现的流水线MIPS架构CPU，该CPU支持28条指令，为此，笔者设计了PC，D_Reg, CMP，GRF，EXT，NPC，E_Reg,MDU，ALU，M_Reg,Load,Store,W_Reg,HCU模块，其中IM和DM通过外设实现。整体搭建采用自下而上的方式完成，该CPU的译码方式是分布式译码。<br>顶层模块设计图如下<br><img lazyload src="/images/loading.svg" data-src="/./P6/%E8%AE%BE%E8%AE%A1%E7%A8%BF(1).jpg" alt="1"> </p>
 <h2 id="1-2-实现指令说明"><a href="#1-2-实现指令说明" class="headerlink" title="1.2 实现指令说明"></a>1.2 实现指令说明</h2><ul>
 <li>cal_R : add,sub,and,or,slt,sltu,lui</li>
 <li>cal_I : addi,andi,ori</li>
