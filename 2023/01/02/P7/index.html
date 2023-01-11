@@ -41,7 +41,7 @@
     <script id="hexo-configurations">
     let REDEFINE = window.REDEFINE || {};
     REDEFINE.hexo_config = {"hostname":"coooookie0913.github.io","root":"/","language":"en","path":"search.xml"};
-    REDEFINE.theme_config = {"toc":{"enable":true,"number":false,"expand_all":true,"init_open":true},"style":{"primary_color":"#005080","avatar":"/images/cookie.png","favicon":"/images/cookie.png","article_img_align":"center","right_side_width":"210px","content_max_width":"1000px","nav_color":{"left":"#f78736","right":"#367df7","transparency":35},"hover":{"shadow":true,"scale":false},"first_screen":{"enable":true,"background_image":{"light":"https://evan.beee.top/img/wallhaven-wqery6-light.webp","dark":"https://evan.beee.top/img/wallhaven-wqery6-dark.webp"},"title_color":{"light":"#fff","dark":"#d1d1b6"},"description":"Coooookie's Blog"},"scroll":{"progress_bar":{"enable":true},"percent":{"enable":false}}},"local_search":{"enable":true,"preload":true},"code_block":{"copy":true,"style":"mac"},"pjax":{"enable":true},"lazyload":{"enable":false},"version":"0.4.5","friend_links":{"columns":3}};
+    REDEFINE.theme_config = {"toc":{"enable":true,"number":false,"expand_all":true,"init_open":true},"style":{"primary_color":"#005080","avatar":"/images/cookie.png","favicon":"/images/cookie.png","article_img_align":"center","right_side_width":"210px","content_max_width":"1000px","nav_color":{"left":"#f78736","right":"#367df7","transparency":35},"hover":{"shadow":true,"scale":false},"first_screen":{"enable":true,"background_image":{"light":"https://evan.beee.top/img/wallhaven-wqery6-light.webp","dark":"https://evan.beee.top/img/wallhaven-wqery6-dark.webp"},"title_color":{"light":"#fff","dark":"#d1d1b6"},"description":"Coooookie's Blog"},"scroll":{"progress_bar":{"enable":true},"percent":{"enable":false}}},"local_search":{"enable":true,"preload":true},"code_block":{"copy":true,"style":"mac"},"pjax":{"enable":true},"lazyload":{"enable":true},"version":"0.4.5","friend_links":{"columns":3}};
     REDEFINE.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
   </script>
 <meta name="generator" content="Hexo 6.3.0"></head>
@@ -347,7 +347,7 @@
             
 
             <div class="article-content markdown-body">
-                <h1 id="P7-Study"><a href="#P7-Study" class="headerlink" title="P7_Study"></a>P7_Study</h1><h2 id="设计概述"><a href="#设计概述" class="headerlink" title="设计概述"></a>设计概述</h2><p>本文设计的是又Verilog实现的MIPS微系统，该微系统支持33条汇编指令，为实现该功能，笔者设计PC，CMP，GRF，EXT，NPC，ALU，MD，Load，Store，CP0，D_Reg,E_Reg,M_Reg,W_Reg,MCU,HCU,Bridge,TC模块。<br>顶层结构如下：<br><img src="/P7/P7%E9%A1%B6%E5%B1%82%E6%A8%A1%E5%9D%97.png" alt="1"><br>CPU内部如下：<br><img src="/P7/CPU%E5%86%85%E9%83%A8.png" alt="1"></p>
+                <h1 id="P7-Study"><a href="#P7-Study" class="headerlink" title="P7_Study"></a>P7_Study</h1><h2 id="设计概述"><a href="#设计概述" class="headerlink" title="设计概述"></a>设计概述</h2><p>本文设计的是又Verilog实现的MIPS微系统，该微系统支持33条汇编指令，为实现该功能，笔者设计PC，CMP，GRF，EXT，NPC，ALU，MD，Load，Store，CP0，D_Reg,E_Reg,M_Reg,W_Reg,MCU,HCU,Bridge,TC模块。<br>顶层结构如下：<br><img lazyload src="/images/loading.svg" data-src="/P7/P7%E9%A1%B6%E5%B1%82%E6%A8%A1%E5%9D%97.png" alt="1"><br>CPU内部如下：<br><img lazyload src="/images/loading.svg" data-src="/P7/CPU%E5%86%85%E9%83%A8.png" alt="1"></p>
 <h2 id="指令说明"><a href="#指令说明" class="headerlink" title="指令说明"></a>指令说明</h2><ul>
 <li>cal_R : add,sub,and,or,slt,sltu,lui</li>
 <li>cal_I : addi,andi,ori</li>
@@ -1149,6 +1149,10 @@ EPC的确定以及对于Req的操作<div class="highlight-container" data-rel="V
 <script src="/js/code-copy.js"></script>
 
 
+
+
+    
+<script src="/js/lazyload.js"></script>
 
 
 

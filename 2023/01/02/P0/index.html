@@ -41,7 +41,7 @@
     <script id="hexo-configurations">
     let REDEFINE = window.REDEFINE || {};
     REDEFINE.hexo_config = {"hostname":"coooookie0913.github.io","root":"/","language":"en","path":"search.xml"};
-    REDEFINE.theme_config = {"toc":{"enable":true,"number":false,"expand_all":true,"init_open":true},"style":{"primary_color":"#005080","avatar":"/images/cookie.png","favicon":"/images/cookie.png","article_img_align":"center","right_side_width":"210px","content_max_width":"1000px","nav_color":{"left":"#f78736","right":"#367df7","transparency":35},"hover":{"shadow":true,"scale":false},"first_screen":{"enable":true,"background_image":{"light":"https://evan.beee.top/img/wallhaven-wqery6-light.webp","dark":"https://evan.beee.top/img/wallhaven-wqery6-dark.webp"},"title_color":{"light":"#fff","dark":"#d1d1b6"},"description":"Coooookie's Blog"},"scroll":{"progress_bar":{"enable":true},"percent":{"enable":false}}},"local_search":{"enable":true,"preload":true},"code_block":{"copy":true,"style":"mac"},"pjax":{"enable":true},"lazyload":{"enable":false},"version":"0.4.5","friend_links":{"columns":3}};
+    REDEFINE.theme_config = {"toc":{"enable":true,"number":false,"expand_all":true,"init_open":true},"style":{"primary_color":"#005080","avatar":"/images/cookie.png","favicon":"/images/cookie.png","article_img_align":"center","right_side_width":"210px","content_max_width":"1000px","nav_color":{"left":"#f78736","right":"#367df7","transparency":35},"hover":{"shadow":true,"scale":false},"first_screen":{"enable":true,"background_image":{"light":"https://evan.beee.top/img/wallhaven-wqery6-light.webp","dark":"https://evan.beee.top/img/wallhaven-wqery6-dark.webp"},"title_color":{"light":"#fff","dark":"#d1d1b6"},"description":"Coooookie's Blog"},"scroll":{"progress_bar":{"enable":true},"percent":{"enable":false}}},"local_search":{"enable":true,"preload":true},"code_block":{"copy":true,"style":"mac"},"pjax":{"enable":true},"lazyload":{"enable":true},"version":"0.4.5","friend_links":{"columns":3}};
     REDEFINE.language_ago = {"second":"%s seconds ago","minute":"%s minutes ago","hour":"%s hours ago","day":"%s days ago","week":"%s weeks ago","month":"%s months ago","year":"%s years ago"};
   </script>
 <meta name="generator" content="Hexo 6.3.0"></head>
@@ -352,7 +352,7 @@
 <li>功能分析<br>（可以先进行类似于表格的书面化说明，明白好设计思路与设计需求再去设计电路）</li>
 <li>分层设计与分模块设计<br>模块类似于函数的封装，便于理清思路、清晰电路、debug<br>eg1.Moore机与Mealy机都可以划分为状态转移、状态存储、输出模块<br>eg2.32位加法器分为多个一位加法器<br>PS：注意子电路的<strong>appearance</strong>，要跟题目要求一致</li>
 </ol>
-<h2 id="有限状态机"><a href="#有限状态机" class="headerlink" title="有限状态机"></a>有限状态机</h2><p>首先回顾一下Moore和Mealy叭！<br><img src="/P0/Moore&Mealy.png" alt="1"></p>
+<h2 id="有限状态机"><a href="#有限状态机" class="headerlink" title="有限状态机"></a>有限状态机</h2><p>首先回顾一下Moore和Mealy叭！<br><img lazyload src="/images/loading.svg" data-src="/P0/Moore&Mealy.png" alt="1"></p>
 <ol>
 <li>状态转移电路一般只是<strong>组合逻辑</strong>的计算，也就是说随着input的变化（无论clk处于什么状态），其计算的状态也相应发生，所以一定要有<em>状态存储</em>模块，clk处于上升沿时输出prev_state存入now_state</li>
 <li>对于组合逻辑部分，画好状态转移图，一个经济有效的方法就是<em>打表</em>，利用analyze circuit来实现  </li>
@@ -370,7 +370,7 @@
 <li>三态问题？什么时候用三态？（好像三态的输入用逻辑门运算会变红）<br>不用考虑三态</li>
 <li>二进制减法qaq不会（主要是ftoi那里）<br>扩展为32位，再用0去减<br>用0去减其实与非门等效</li>
 </ol>
-<h2 id="CRC"><a href="#CRC" class="headerlink" title="CRC"></a>CRC</h2><p><img src="/P0/CRC%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF.png" alt="1"><br><img src="/P0/CRC%E8%AE%A1%E7%AE%97%E8%BF%87%E7%A8%8B.png" alt="1"></p>
+<h2 id="CRC"><a href="#CRC" class="headerlink" title="CRC"></a>CRC</h2><p><img lazyload src="/images/loading.svg" data-src="/P0/CRC%E5%AE%9E%E7%8E%B0%E6%80%9D%E8%B7%AF.png" alt="1"><br><img lazyload src="/images/loading.svg" data-src="/P0/CRC%E8%AE%A1%E7%AE%97%E8%BF%87%E7%A8%8B.png" alt="1"></p>
 <ol>
 <li>体现了模块化的思想</li>
 <li>要审题，题目说了被除数是要拼接的</li>
@@ -394,17 +394,17 @@
 <h2 id="五人投票"><a href="#五人投票" class="headerlink" title="五人投票"></a>五人投票</h2><ol>
 <li>题意描述：四个组员（00-11）一个组长，组长可以投屏蔽票，并指定一人屏蔽他的投票，组员是赞成、反对、弃权，组长是赞成、反对、弃权、屏蔽，若赞成票数大于反对票数，则输出1，否则输出0</li>
 <li>主要思路：首先用比较器判断每个人是投赞成还是反对（是则对应输出为1，组长投屏蔽票时，则其对应的赞成和反对的输出都为0；组员的统计使用了一个mux，如果是被屏蔽了则把其输入置为弃权票），然后分别把赞成和反对的票数相加，最后用一个比较器绝定输出</li>
-<li>错误：①使用比较器的时候习惯性连亮着的点，连错端口<br>②比较器要置为unsigned（根据数据类型决定比较器的参数属性）<br><img src="/P0/%E6%AF%94%E8%BE%83%E5%99%A81.jpg" alt="1"><br><img src="/P0/%E6%AF%94%E8%BE%83%E5%99%A82.jpg" alt="1"></li>
-<li>优化：线路过于凌乱复杂，评论区给出了更好的解决方法<br>使用bit adder而非那么多加法器<br><img src="/P0/bit%20adder.png" alt="1"></li>
+<li>错误：①使用比较器的时候习惯性连亮着的点，连错端口<br>②比较器要置为unsigned（根据数据类型决定比较器的参数属性）<br><img lazyload src="/images/loading.svg" data-src="/P0/%E6%AF%94%E8%BE%83%E5%99%A81.jpg" alt="1"><br><img lazyload src="/images/loading.svg" data-src="/P0/%E6%AF%94%E8%BE%83%E5%99%A82.jpg" alt="1"></li>
+<li>优化：线路过于凌乱复杂，评论区给出了更好的解决方法<br>使用bit adder而非那么多加法器<br><img lazyload src="/images/loading.svg" data-src="/P0/bit%20adder.png" alt="1"></li>
 </ol>
 <h2 id="字符匹配"><a href="#字符匹配" class="headerlink" title="字符匹配"></a>字符匹配</h2><ol>
 <li>本题要求一个mealy机来匹配字符串0121（输出01）和1210（输出10），无匹配则输出00</li>
 <li>解题思路：基本的mealy型状态机，即数据输入、状态转移、状态存储、状态输出。其中状态转移和状态输出打表解决。这里需要注意的是有九个状态，状态转移很复杂，一不小心就会出错。</li>
 <li>错误：①注意输入0把之前的输入失配之后，应转移到已匹配一个0的情况而非初始状态<br>②已匹配0121后，再输入0，则匹配到1210；再输入2，转移到匹配了12的状态<br>反正就多注意吧，仔细一点</li>
-<li>优化：利用高老师上课讲的移位的方法，使用三个串联寄存器或者三位的移位寄存器（因为此处只是mealy机），用每一次输入之后input、s0、s1、s2来分别与0121和1210比较<br>三个寄存器串联<br><img src="/P0/P0L2%E4%B8%89%E4%B8%AA%E5%AF%84%E5%AD%98%E5%99%A81.png" alt="1"><br><img src="/P0/P0L2%E4%B8%89%E4%B8%AA%E5%AF%84%E5%AD%98%E5%99%A82.png" alt="1"><br><strong>注意</strong> 此处需要给寄存器赋一个并不会出现的初值3，否则寄存器默认初始值0，则会使匹配出现问题<br>使用移位寄存器<br><img src="/P0/%E7%A7%BB%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8.jpg" alt="1"><br><img src="/P0/P0L2%E7%A7%BB%E4%BD%8D%E5%99%A8%E5%AE%9E%E7%8E%B0.jpg" alt="1"><br><strong>注意</strong> 此处也是赋初值问题，为了避免初始默认0造成的影响，同学提供了在最高位加上1校验的方法（00-&gt;100,01-&gt;101 etc）</li>
+<li>优化：利用高老师上课讲的移位的方法，使用三个串联寄存器或者三位的移位寄存器（因为此处只是mealy机），用每一次输入之后input、s0、s1、s2来分别与0121和1210比较<br>三个寄存器串联<br><img lazyload src="/images/loading.svg" data-src="/P0/P0L2%E4%B8%89%E4%B8%AA%E5%AF%84%E5%AD%98%E5%99%A81.png" alt="1"><br><img lazyload src="/images/loading.svg" data-src="/P0/P0L2%E4%B8%89%E4%B8%AA%E5%AF%84%E5%AD%98%E5%99%A82.png" alt="1"><br><strong>注意</strong> 此处需要给寄存器赋一个并不会出现的初值3，否则寄存器默认初始值0，则会使匹配出现问题<br>使用移位寄存器<br><img lazyload src="/images/loading.svg" data-src="/P0/%E7%A7%BB%E4%BD%8D%E5%AF%84%E5%AD%98%E5%99%A8.jpg" alt="1"><br><img lazyload src="/images/loading.svg" data-src="/P0/P0L2%E7%A7%BB%E4%BD%8D%E5%99%A8%E5%AE%9E%E7%8E%B0.jpg" alt="1"><br><strong>注意</strong> 此处也是赋初值问题，为了避免初始默认0造成的影响，同学提供了在最高位加上1校验的方法（00-&gt;100,01-&gt;101 etc）</li>
 <li>后记：认真听讲，多去思考讨论，学习简洁优美的思路</li>
 </ol>
-<h2 id="类斐波那契"><a href="#类斐波那契" class="headerlink" title="类斐波那契"></a>类斐波那契</h2><p>斐波那契好像是P0绕不过去的点了，就是一年比一年复杂qaq。不应该着急走的，其实慢慢做，静心想，也没有很难！<br>题目：<br><img src="/P0/P0L3%E9%A2%98%E7%9B%AE.png" alt="1"><br>这里提供一个讨论区使用移位寄存器的方法，使用寄存器串联同理<br><img src="/P0/P0L3%E5%AF%84%E5%AD%98%E5%99%A8%E5%AE%9E%E7%8E%B0.png" alt="1"></p>
+<h2 id="类斐波那契"><a href="#类斐波那契" class="headerlink" title="类斐波那契"></a>类斐波那契</h2><p>斐波那契好像是P0绕不过去的点了，就是一年比一年复杂qaq。不应该着急走的，其实慢慢做，静心想，也没有很难！<br>题目：<br><img lazyload src="/images/loading.svg" data-src="/P0/P0L3%E9%A2%98%E7%9B%AE.png" alt="1"><br>这里提供一个讨论区使用移位寄存器的方法，使用寄存器串联同理<br><img lazyload src="/images/loading.svg" data-src="/P0/P0L3%E5%AF%84%E5%AD%98%E5%99%A8%E5%AE%9E%E7%8E%B0.png" alt="1"></p>
 <ol>
 <li>计数器在第一个时钟上升沿结束后变成1</li>
 <li>每个时钟上升沿到来都会立即把s_x存入移位寄存器，然后相应后面的s_x又会更新，因为是组合逻辑。在第n个时钟上升沿到来把f(n-1)存入了移位寄存器，此时s_x也改变为f(n),所以第n+1个时钟上升沿到来时，f(n)存入结果寄存器</li>
@@ -689,6 +689,10 @@
 <script src="/js/code-copy.js"></script>
 
 
+
+
+    
+<script src="/js/lazyload.js"></script>
 
 
 
